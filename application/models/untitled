@@ -1,0 +1,25 @@
+
+SELECT a.*,(a.debet-kredit) AS saldo
+FROM
+(
+	SELECT 
+	a.tanggal,
+	SUM(a.debet) AS debet,
+	SUM(a.kredit) AS kredit
+	FROM
+	(
+		SELECT a.*,
+		CASE WHEN a.jenis='masuk' THEN a.jumlah  END AS debet,
+		CASE WHEN a.jenis='keluar' THEN a.jumlah  END AS kredit
+		FROM 
+		(
+		SELECT a.*,DATE(a.tgl_update) AS tanggal,b.nama,b.jenis FROM `tbl_transaksi` a 
+		INNER JOIN tbl_group_transaksi b 
+		ON a.id_group=b.id
+		)a
+	)a
+	GROUP BY a.tanggal
+
+)a
+ORDER BY a.tanggal ASC
+
