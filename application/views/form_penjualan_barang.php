@@ -32,23 +32,26 @@
 
 <form id="penjualan_barang">
   <div class="row">
+  
   <div class="col-sm-3">
-    <input type="text" name="tgl_trx_manual" value="<?php echo date('Y-m-d H:i:s')?>" class="form-control">
-    <small><i>Format Y-m-d H:i:s</i></small>
-    <input type="hidden" name="grup_penjualan" value="<?php echo date('ymdHis')?>" class="form-control" readonly>
-  </div>
-  <div class="col-sm-3">
-    <input type="text" name="nama_pembeli" value="" class="form-control" required placeholder="Nama pembeli">
+    <input type="text" name="nama_pembeli" id="nama_pembeli" value="" class="form-control" required placeholder="Nama pembeli">
+    <input type="hidden" name="id_pelanggan" id="id_pelanggan">
     <small><i>Nama Pembeli</i></small>
   </div>
   <div class="col-sm-3">
-    <input type="text" name="hp_pembeli" value="" class="form-control" required placeholder="HP pembeli">
+    <input type="text" name="hp_pembeli" id="hp_pembeli" value="" class="form-control" required placeholder="HP pembeli">
     <small><i>HP Pembeli</i></small>
   </div>
   <div class="col-sm-3">
-    <input type="text" name="nama_packing" value="" class="form-control" required placeholder="Nama Packing">
+    <input type="text" name="nama_packing" value="" class="form-control" placeholder="Nama Packing">
     <small><i>Nama Packing</i></small>
   </div>
+  <div class="col-sm-3">
+    <input type="text" name="tgl_trx_manual" value="<?php echo date('Y-m-d H:i:s')?>" class="form-control datepicker">
+    <small><i>Format Y-m-d H:i:s</i></small>
+    <input type="hidden" name="grup_penjualan" value="<?php echo date('ymdHis')?>" class="form-control " readonly>
+  </div>
+
 </div>
   <div style="clear: both;"></div>
   <br>
@@ -82,6 +85,38 @@
           </td>
           <td></td>
         </tr>
+
+        <td colspan="6" align="right"><b>Biaya ke ekspedisi</b></td>
+          <td  align="right" >
+            <input id="t4_transport_ke_ekspedisi" type="text" name="transport_ke_ekspedisi" class="form-control nomor" value="0" style="text-align:right;">
+          </td>
+          <td></td>
+        </tr>
+        
+        <tr>
+          <td colspan="6" align="right"><b>Ekspedisi</b></td>
+          <td id="" align="right" >
+            <div class="row">
+            <div class="col-sm-6">
+            <select name="nama_ekspedisi" class="form-control" id="nama_ekspedisi">
+                <option value="">--Pilih---</option>
+                <?php 
+                  foreach ($eksepedisi as $eks) {
+                    echo "<option value='$eks->nama_ekspedisi'>$eks->nama_ekspedisi</option>";
+                  }
+                ?>
+              </select>
+            </div>
+            <div class="col-sm-6">
+              <input id="t4_ekspedisi" type="text" name="harga_ekspedisi" class="form-control nomor" value="0" style="text-align:right;">
+            </div>
+            </div>
+          </td>              
+          <td></td>
+        </tr>
+
+
+
         <tr>
           <td colspan="6" align="right"><b>Total</b></td>
           <td id="t4_total" align="right" style="font-weight: bold;"></td><td></td>
@@ -134,6 +169,49 @@
 <script type="text/javascript">
 var classnya = "<?php echo $this->router->fetch_class();?>";
 $(".barang").focus();
+
+$('.datepicker').datepicker({
+  autoclose: true,
+  format: 'yyyy-mm-dd <?php echo date('H:i:s')?>' 
+})
+
+<?php 
+  $p = '';
+  foreach ($pelanggan as $pp) {
+    $p.='{value:"'.$pp->id_pelanggan.'",label:"'.htmlentities($pp->nama_pembeli).'",hp_pembeli:"'.htmlentities($pp->hp_pembeli).'"},';
+  }
+?>
+$(function(){
+  var semuaPelanggan = [<?php echo $p?>];
+  $("#nama_pembeli").autocomplete({
+      source:semuaPelanggan,
+      minLength:1,
+      select:function(ev,ui){
+        console.log(ui.item.value);
+        $("#id_pelanggan").val(ui.item.value);
+        $("#hp_pembeli").val(ui.item.hp_pembeli);
+        $(this).val(ui.item.label);
+        return false;
+      }
+  })
+})
+
+
+$("#nama_ekspedisi").on("change",function(){
+  if($(this).val()=="")
+  {
+    $("#t4_ekspedisi").val("0");
+  }
+  $.get("<?php echo base_url()?>index.php/ekspedisi/by_nama/"+encodeURI($(this).val()),function(e){
+      console.log(e);
+      
+      $("#t4_ekspedisi").val(e[0].harga_ekspedisi);
+      total();
+
+  })
+})
+
+
 
 
 <?php
@@ -245,7 +323,7 @@ $("#tbl_datanya").on("keydown keyup mousedown mouseup select contextmenu drop","
 
 
 
-$("#t4_diskon").on("keydown keyup mousedown mouseup select contextmenu drop",function(){
+$("#t4_diskon,#nama_ekspedisi,#t4_transport_ke_ekspedisi,#t4_ekspedisi").on("keydown keyup mousedown mouseup select contextmenu drop",function(){
     total();
 })
 
@@ -287,7 +365,10 @@ function total()
   console.log(total);
 
   var diskon = parseInt(buang_titik($("#t4_diskon").val()));
-
+  var harga_ekspedisi = parseInt(buang_titik($("#t4_ekspedisi").val()));
+  var transport_ke_ekspedisi = parseInt(buang_titik($("#t4_transport_ke_ekspedisi").val()));
+  total+=transport_ke_ekspedisi;
+  total+=harga_ekspedisi;
   total-=diskon;
   $("#t4_total").html(formatRupiah(total));
 }

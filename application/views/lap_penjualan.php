@@ -38,6 +38,8 @@
               <th>Kode Trx.</th>                     
               <th>Sub Total</th>                     
               <th>Diskon</th>                     
+              <th>Ekspedisi</th>                     
+              <th>Transport Ke Ekspedisi</th>                     
               <th>Total</th>                     
               <th>Struk</th>                     
               
@@ -61,7 +63,9 @@
                 <td>$x->grup_penjualan</td>                
                 <td align=right>".rupiah($x->total)."</td>                
                 <td align=right>".rupiah($x->diskon)."</td>                
-                <td align=right>".rupiah($x->total-$x->diskon)."</td>                
+                <td align=right>".rupiah($x->harga_ekspedisi)."</td>                
+                <td align=right>".rupiah($x->transport_ke_ekspedisi)."</td>                
+                <td align=right>".rupiah($x->total-$x->diskon+($x->harga_ekspedisi+$x->transport_ke_ekspedisi))."</td>                
                 <td><a href='".base_url()."index.php/barang/struk_penjualan/".$x->grup_penjualan."' target='blank'>Print</a></td>                                
               </tr>
           ");

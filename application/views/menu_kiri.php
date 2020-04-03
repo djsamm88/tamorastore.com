@@ -137,6 +137,74 @@
 
 
 
+        <li class="treeview">
+          
+          <a href="#"><i class="fa fa-users"></i> <span>Pelanggan</span>
+            <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+          </a>
+
+          <ul class="treeview-menu">
+             <li>
+              <a href="#" onclick="eksekusi_controller('<?php echo base_url()?>index.php/Pelanggan/data','Master Pelanggan');return false;">
+                <i class="fa fa-link"></i> <span>Data</span>
+              </a>
+            </li>
+
+            
+            
+          </ul>
+        </li>
+
+
+
+        <li class="treeview">
+          
+          <a href="#"><i class="fa fa-car"></i> <span>Ekspedisi</span>
+            <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+          </a>
+
+          <ul class="treeview-menu">
+             <li>
+              <a href="#" onclick="eksekusi_controller('<?php echo base_url()?>index.php/ekspedisi/data','Master Ekspedisi');return false;">
+                <i class="fa fa-link"></i> <span>Data</span>
+              </a>
+            </li>
+
+            
+          </ul>
+        </li>
+
+
+
+
+        <li class="treeview">
+          
+          <a href="#"><i class="fa fa-institution"></i> <span>Gudang</span>
+            <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+          </a>
+
+          <ul class="treeview-menu">
+             <li>
+              <a href="#" onclick="eksekusi_controller('<?php echo base_url()?>index.php/gudang/data','Master Gudang');return false;">
+                <i class="fa fa-link"></i> <span>Data</span>
+              </a>
+            </li>
+
+            
+            
+          </ul>
+        </li>
+
+
+
+        
+
         <!--
         <li>
           <a href="#" onclick="eksekusi_controller('<?php echo base_url()?>index.php/pembatalan/data_paket','Data Pembatalan');return false;">

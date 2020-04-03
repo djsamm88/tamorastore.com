@@ -153,7 +153,8 @@ if (!defined('BASEPATH'))exit('No direct script access allowed');
 
 	public function m_lap_penjualan()
 	{
-		$q = $this->db->query("SELECT grup_penjualan,SUM(sub_total_jual) AS total, diskon,tgl_transaksi,nama_pembeli,hp_pembeli,nama_packing,tgl_transaksi,tgl_trx_manual 
+		$q = $this->db->query("SELECT grup_penjualan,SUM(sub_total_jual) AS total, diskon,tgl_transaksi,nama_pembeli,hp_pembeli,nama_packing,tgl_transaksi,tgl_trx_manual,
+			harga_ekspedisi,transport_ke_ekspedisi 
 			FROM `tbl_barang_transaksi` 
 			WHERE jenis='keluar'
 			GROUP BY grup_penjualan

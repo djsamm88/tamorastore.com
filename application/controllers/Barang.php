@@ -17,13 +17,15 @@ class Barang extends CI_Controller {
 		//$this->load->library('datatables');
 		$this->load->model('m_barang');
 		$this->load->model('m_ambil');
+		$this->load->model('m_pelanggan');
+		$this->load->model('m_ekspedisi');
 
 	}
 
 
 	public function barang_transaksi()
 	{
-		$data['all'] = $this->m_barang->m_barang_transaksi();	
+		$data['all'] = $this->m_barang->m_barang_transaksi();			
 		$this->load->view('barang_transaksi',$data);
 	}
 
@@ -39,6 +41,24 @@ class Barang extends CI_Controller {
 	public function go_jual()
 	{
 		$data = $this->input->post();
+
+		/********* insert pelanggan ************/
+		$arrPelanggan = array(
+				"nama_pembeli" 	=>$data['nama_pembeli'],
+				"hp_pembeli" 	=>$data['hp_pembeli'],
+				"tgl_daftar" 	=>date('Y-m-d H:i:s')
+		);
+		if($data['id_pelanggan']=="")
+		{
+			$id_pelanggan = $this->m_pelanggan->insert($arrPelanggan);
+		}else{
+			$id_pelanggan 	= $data['id_pelanggan'];
+			$arrUpdate 		= array(
+								"tgl_trx_terakhir"=>date('Y-m-d H:i:s')
+							  );
+			$this->m_pelanggan->update($arrUpdate,$id_pelanggan);
+		}
+		/********* insert pelanggan ************/
 
 		//var_dump($data);
 		$total_tanpa_diskon =0; 
@@ -57,7 +77,9 @@ class Barang extends CI_Controller {
 			$serialize['harga_jual'] 	= hanya_nomor($harga_jual);
 			$serialize['satuan_jual'] 	= $data['satuan_jual'][$key];
 			$serialize['jenis'] 		= 'keluar';
-			$serialize['grup_penjualan'] = $data['grup_penjualan'];			
+			$serialize['grup_penjualan'] = $data['grup_penjualan'];		
+
+			$serialize['id_pelanggan'] 	= $id_pelanggan;
 			$serialize['nama_pembeli'] 	= $data['nama_pembeli'];
 			$serialize['hp_pembeli'] 	= $data['hp_pembeli'];
 			
@@ -65,12 +87,12 @@ class Barang extends CI_Controller {
 			$serialize['tgl_trx_manual']= $data['tgl_trx_manual'];
 			$serialize['keterangan']	= $data['keterangan'];
 
-
-
-
 			$serialize['diskon'] 		= hanya_nomor($data['diskon']);
 			$serialize['bayar'] 		= hanya_nomor($data['bayar']);
-
+			$serialize['transport_ke_ekspedisi'] = hanya_nomor($data['transport_ke_ekspedisi']);
+			$serialize['harga_ekspedisi'] 		 = hanya_nomor($data['harga_ekspedisi']);
+			$serialize['nama_ekspedisi'] 		 = ($data['nama_ekspedisi']);
+			
 			$serialize['sub_total_jual']= $serialize['harga_jual']*$data['jumlah'][$key];
 			$serialize['sub_total_beli']= $barang->harga_pokok*$data['jumlah'][$key];
 			$serialize['qty_jual']		= $data['jumlah'][$key];
@@ -90,9 +112,17 @@ class Barang extends CI_Controller {
 		}
 
 
+		$serialize['transport_ke_ekspedisi'] = hanya_nomor($data['transport_ke_ekspedisi']);
+		$serialize['harga_ekspedisi'] 		 = hanya_nomor($data['harga_ekspedisi']);
+
 
 		/*********** insert ke transaksi **************/	
-		$ket = "Kpd: [".$data['nama_pembeli']."] nama packing: [".$data['nama_packing']."] Kode TRX:[".$data['grup_penjualan']."] Jumlah:[".rupiah($total_tanpa_diskon)."] diskon:[".$data['diskon']."] ".$data['keterangan'];
+		$ket = "Kpd: [".$data['nama_pembeli']."] - Kode TRX:[".$data['grup_penjualan']."] 
+				Jumlah:[".rupiah($total_tanpa_diskon)."] 
+				diskon:[".$data['diskon']."] 
+				harga_ekspedisi:[".$data['harga_ekspedisi']."] 
+				transport_ke_ekspedisi:[".$data['transport_ke_ekspedisi']."] 
+				".$data['keterangan'];
 
 		$ser_trx = array(
 						"id_group"		=> "8",							
@@ -100,7 +130,10 @@ class Barang extends CI_Controller {
 						"jumlah"		=> ($total_tanpa_diskon),
 						"harga_beli"	=> ($total_harga_beli),
 						"diskon"		=> $serialize['diskon'],
-						"id_referensi"	=> $data['grup_penjualan']
+						"harga_ekspedisi"			=> $serialize['harga_ekspedisi'],
+						"transport_ke_ekspedisi"	=> $serialize['transport_ke_ekspedisi'],
+						"id_referensi"	=> $data['grup_penjualan'],
+						"id_pelanggan"	=> $id_pelanggan
 					);				
 		/* untuk id_referensi = id_group/id_table*/				
 		$this->db->set($ser_trx);
@@ -122,12 +155,78 @@ class Barang extends CI_Controller {
 		}		
 		/********* insert diskon **********/
 
+		/********* insert transport_ke_ekspedisi **********/
+		if(hanya_nomor($data['transport_ke_ekspedisi'])>0)
+		{
+			$ser_trx_diskon = array(
+						"id_group"=>"14",							
+						"keterangan"=>$ket,
+						"jumlah"=>hanya_nomor($data['transport_ke_ekspedisi']),
+						"id_referensi"=>$data['grup_penjualan']
+					);	
+			$this->db->set($ser_trx_diskon);
+			$this->db->insert('tbl_transaksi');
+
+		}		
+		/********* insert transport_ke_ekspedisi **********/
+
+
+		/********* insert harga_ekspedisi **********/
+		if(hanya_nomor($data['harga_ekspedisi'])>0)
+		{
+			$ser_trx_diskon = array(
+						"id_group"=>"13",							
+						"keterangan"=>$ket,
+						"jumlah"=>hanya_nomor($data['transport_ke_ekspedisi']),
+						"id_referensi"=>$data['grup_penjualan']
+					);	
+			$this->db->set($ser_trx_diskon);
+			$this->db->insert('tbl_transaksi');
+
+		}		
+		/********* insert harga_ekspedisi **********/
+
+
+		/********* insert transport_ke_ekspedisi_keluar **********/
+		if(hanya_nomor($data['transport_ke_ekspedisi'])>0)
+		{
+			$ser_trx_diskon = array(
+						"id_group"=>"16",							
+						"keterangan"=>$ket,
+						"jumlah"=>hanya_nomor($data['transport_ke_ekspedisi']),
+						"id_referensi"=>$data['grup_penjualan']
+					);	
+			$this->db->set($ser_trx_diskon);
+			$this->db->insert('tbl_transaksi');
+
+		}		
+		/********* insert transport_ke_ekspedisi_keluar **********/
+
+
+		/********* insert harga_ekspedisi **********/
+		if(hanya_nomor($data['harga_ekspedisi'])>0)
+		{
+			$ser_trx_diskon = array(
+						"id_group"=>"15",							
+						"keterangan"=>$ket,
+						"jumlah"=>hanya_nomor($data['transport_ke_ekspedisi']),
+						"id_referensi"=>$data['grup_penjualan']
+					);	
+			$this->db->set($ser_trx_diskon);
+			$this->db->insert('tbl_transaksi');
+
+		}		
+		/********* insert harga_ekspedisi **********/
+		
+
 		echo $data['grup_penjualan'];
 	}
 
 	public function form_penjualan()
 	{
 		$data['all'] = $this->m_barang->m_data();		
+		$data['pelanggan'] = $this->m_pelanggan->m_data();	
+		$data['eksepedisi'] = $this->m_ekspedisi->m_data();	
 		$this->load->view('form_penjualan_barang',$data);
 	}
 

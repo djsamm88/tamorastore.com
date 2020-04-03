@@ -82,7 +82,7 @@ font-size:10px;
 	}
 	
 	$total_diskon = $tot-$data[0]->diskon;
-
+	$total = $total_diskon+$data[0]->harga_ekspedisi+$data[0]->transport_ke_ekspedisi;
 	echo "
 		<tr>
 			<td colspan=5 align=right>Total</td>
@@ -93,8 +93,25 @@ font-size:10px;
 			<td align=right><b>".rupiah($data[0]->diskon)."</b></td>
 		</tr>
 		<tr>
+			<td colspan=5 align=right>Ekspedisi [".$data[0]->nama_ekspedisi."]</td>
+			<td align=right><b>".rupiah($data[0]->harga_ekspedisi)."</b></td>
+		</tr>
+		<tr>
+			<td colspan=5 align=right>Transport ke ekspedisi</td>
+			<td align=right><b>".rupiah($data[0]->transport_ke_ekspedisi)."</b></td>
+		</tr>
+		<tr>
 			<td colspan=5 align=right>Total</td>
-			<td align=right><b>Rp. ".rupiah($total_diskon)."</b></td>
+			<td align=right><b>Rp. ".rupiah($total)."</b></td>
+		</tr>
+		<tr>
+			<td colspan=5 align=right>Bayar</td>
+			<td align=right><b>" . rupiah($data[0]->bayar) . "</b></td>
+		</tr>
+		
+		<tr>
+			<td colspan=5 align=right>Kembali</td>
+			<td align=right><b>" . rupiah($data[0]->bayar - $total) . "</b></td>
 		</tr>
 	";
 ?>
