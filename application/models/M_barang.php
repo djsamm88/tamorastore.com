@@ -59,7 +59,8 @@ if (!defined('BASEPATH'))exit('No direct script access allowed');
 
 	public function m_data()
 	{
-		$q = $this->db->query("SELECT a.*,IFNULL(b.qty,0) AS qty FROM tbl_barang a
+		$q = $this->db->query("SELECT a.*,IFNULL(b.qty,0) AS qty,IFNULL(c.qty,0) AS masuk  
+								FROM tbl_barang a
 								LEFT JOIN(
 										SELECT 
 											a.id_barang, 
@@ -73,11 +74,75 @@ if (!defined('BASEPATH'))exit('No direct script access allowed');
 											ON a.id_barang=b.id_barang 
 								)b
 								ON a.id =b.id_barang								
+								LEFT JOIN (
+									SELECT id_barang,SUM(qty) AS qty FROM `tbl_barang_masuk_tanpa_harga` GROUP BY id_barang
+								)c
+								ON a.id=c.id_barang
 								ORDER BY b.qty DESC
 					");
 		return $q->result();
 	}
 
+
+	public function m_data_gudang($id_gudang)
+	{
+		$q = $this->db->query("SELECT a.*,IFNULL(b.qty,0) AS qty,b.id_gudang,c.nama_gudang,c.reminder
+								FROM tbl_barang a
+								INNER JOIN(
+										SELECT 
+											a.id_barang,a.id_gudang, 
+											IFNULL(a.qty,0)-IFNULL(b.qty,0) AS qty
+											 FROM 
+											(SELECT id_barang,SUM(jumlah) AS qty,id_gudang FROM `tbl_barang_transaksi` WHERE jenis='masuk' GROUP BY id_barang
+											)a 
+											LEFT JOIN 
+											(SELECT id_barang,SUM(jumlah) AS qty FROM `tbl_barang_transaksi` WHERE jenis='keluar' GROUP BY id_barang
+											)b 
+											ON a.id_barang=b.id_barang 
+								)b
+								ON a.id =b.id_barang	
+								LEFT JOIN tbl_gudang c ON b.id_gudang=c.id_gudang
+								WHERE b.id_gudang='$id_gudang'
+								ORDER BY b.qty DESC
+					");
+		return $q;
+	}
+
+
+	public function m_data_beli()
+	{
+		$q = $this->db->query("SELECT 
+								a.*,IFNULL(b.qty,0) AS qty,
+								IFNULL(c.qty,0) AS masuk,
+								c.tgl AS tgl_masuk,
+								c.id_barang_masuk,
+								d.*  
+								FROM tbl_barang a
+								LEFT JOIN(
+										SELECT 
+											a.id_barang, 
+											IFNULL(a.qty,0)-IFNULL(b.qty,0) AS qty
+											 FROM 
+											(SELECT id_barang,SUM(jumlah) AS qty FROM `tbl_barang_transaksi` WHERE jenis='masuk' GROUP BY id_barang
+											)a 
+											LEFT JOIN 
+											(SELECT id_barang,SUM(jumlah) AS qty FROM `tbl_barang_transaksi` WHERE jenis='keluar' GROUP BY id_barang
+											)b 
+											ON a.id_barang=b.id_barang 
+								)b ON a.id =b.id_barang								
+								INNER JOIN `tbl_barang_masuk_tanpa_harga` c ON a.id=c.id_barang
+								LEFT JOIN tbl_gudang d ON c.id_gudang=d.id_gudang	
+								WHERE c.status='belum'							
+								ORDER BY b.qty DESC
+					");
+		return $q->result();
+	}
+
+	public function m_hitung_notif_barang_baru()
+	{
+		$q = $this->db->query("SELECT id_barang_masuk FROM tbl_barang_masuk_tanpa_harga WHERE status='belum'");
+		return $q->num_rows();
+	}
 
 	public function m_return_barang()
 	{

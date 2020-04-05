@@ -310,7 +310,8 @@ desired effect
 <script type="text/javascript">
   // To make Pace works on Ajax calls
   $(document).ajaxStart(function () {
-    Pace.restart()
+    Pace.restart();
+
   })
   $('.ajax').click(function () {
     $.ajax({
@@ -319,13 +320,25 @@ desired effect
       }
     })
   })
-</script>
+
+  
+  $(document).ready(function(){
+    notif();  
+  })
+  function notif()
+  {
+    $.get("<?php echo base_url()?>index.php/barang/notif",function(e){
+      $(".badge_barang_baru").html(e.barang_baru);
+
+      var all_notif_barang = e.barang_baru;
+      $(".badge_barang").html(all_notif_barang);
+      console.log(e);
+    })
+  }
 
 
 
 
-
-<script type="text/javascript">
   $(function () {    
     /* ChartJS
      * -------

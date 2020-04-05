@@ -28,7 +28,7 @@
         </div>
         <div class="box-body">
 <div class="table-responsive">
-<table id="tbl_datanya" class="table  table-striped table-bordered"  cellspacing="0" width="100%">
+<table id="tbl_datanya" class="table  table-striped table-borded"  cellspacing="0" width="100%">
       <thead>
         <tr>
               
@@ -36,10 +36,14 @@
               <th width="10px">Id Barang</th>                         
               <th>Barang</th>                     
               <th>Stok Awal</th>                                   
-              <th>Harga Pokok</th>                                   
-              <th class='warning'>Harga Beli @</th>                     
-              <th class='warning'>Qty</th>                     
-              <th class='warning'>Act</th>
+              <th>Harga Beli Awal</th>                                   
+              <th>Harga Beli</th>                                   
+              <th>Atur Harga Jual</th>                                   
+              
+              <th>Qty Masuk</th>                     
+              <th>Gudang</th>                     
+              <th>Tgl Masuk</th>                     
+              <th>Act</th>
               
               
         </tr>
@@ -47,6 +51,7 @@
       <tbody>
         <?php         
         $no = 0;
+        
         foreach($all as $x)
         {
           $no++;
@@ -60,13 +65,37 @@
                 <td id='qty_awal'>$x->qty</td>    
                 <td id='harga_awal'>".rupiah($x->harga_pokok)."</td>    
 
-                <td class='warning'><input class='form-control nomor' name='harga' type='' value='' id='harga'></td>                
-                <td class='warning'>
-                  <input class='form-control' name='qty' type='number' id='qty'>
-                  
+                <td class=''>
+                  <input class='form-control nomor' name='harga_beli' value='$x->harga_pokok' id='harga_beli'>
+                </td>  
+
+                 <td class=''>                  
+                  <small><i>Harga Jual Retail</i></small>
+                  <input class='form-control nomor' name='harga_retail' value='$x->harga_retail' id='harga_retail'>
+                  <br>
+                  <small><i>Harga Jual Lusin</i></small>
+                  <input class='form-control nomor' name='harga_lusin' value='$x->harga_lusin' id='harga_lusin'>
+                  <br>
+                  <small><i>Harga Jual Koli</i></small>
+                  <input class='form-control nomor' name='harga_koli' value='$x->harga_koli' id='harga_koli'>
+                </td>  
+                
+
+                <td>
+                  <input class='form-control' name='qty' type='number' id='qty' value='$x->masuk' readonly>
                 </td>
-                <td class='warning'>
-                  <button class='btn btn-danger btn-xs' type='button' id='beli' onclick='go_beli($(this))'>Beli</button>
+                
+                <td>
+                    $x->nama_gudang 
+                    <input name='id_gudang' type='hidden' id='id_gudang' value='$x->id_gudang'>
+                    <input name='id_barang_masuk' type='hidden' id='id_barang_masuk' value='$x->id_barang_masuk'>
+
+                </td>
+
+                <td>$x->tgl_masuk</td>
+
+                <td>
+                  <button class='btn btn-danger btn-xs' type='button' id='beli' onclick='go_beli($(this))'>Simpan</button>
                 </td>
               </tr>
           ");
@@ -137,14 +166,22 @@ function go_beli(ini)
     var harga_awal  = buang_titik(ini.parent().parent().find("#harga_awal").text());
     var qty_awal    = buang_titik(ini.parent().parent().find("#qty_awal").text());
 
-    var harga_beli = buang_titik(ini.parent().parent().find("#harga").val());
+    var harga_beli = buang_titik(ini.parent().parent().find("#harga_beli").val());
+    var harga_retail = buang_titik(ini.parent().parent().find("#harga_retail").val());
+    var harga_lusin = buang_titik(ini.parent().parent().find("#harga_lusin").val());
+    var harga_koli = buang_titik(ini.parent().parent().find("#harga_koli").val());
+
     var qty = buang_titik(ini.parent().parent().find("#qty").val());
     var id_barang  = ini.parent().parent().find("#id_barang").text();
+    var id_gudang = ini.parent().parent().find("#id_gudang").val();
+    var id_barang_masuk = ini.parent().parent().find("#id_barang_masuk").val();
+
+
     //console.log((harga_beli));
     if(harga_beli == "")
     {
       alert("Harga tidak boleh kosong!!!");
-      ini.parent().parent().find("#harga").focus();
+      ini.parent().parent().find("#harga_beli").focus();
       return false;
     }
 
@@ -156,18 +193,42 @@ function go_beli(ini)
       return false;
     }
 
+    if(id_gudang =="")
+    {
+      ini.parent().parent().find("#id_gudang").focus();
+      alert("Gudang harus dipilih!");
+      return false;
+    }
+
     //$("#myModal_beli").modal('show');
 
+    /*ini jika harga otomatis*/
+    /*
     var hasil = Math.round(((parseInt(harga_beli)*parseInt(qty))+(parseInt(harga_awal)*parseInt(qty_awal)))/(parseInt(qty)+parseInt(qty_awal)));
     console.log(hasil);
+    */
+    /*ini jika harga otomatis*/
 
-    if(confirm("Confirm barang masuk dengan harga pokok : Rp."+formatRupiah(hasil)))
+
+    if(confirm("Anda akan menyimpan data. Anda yakin?"))
     {
-      var ser = {id_barang:id_barang,qty:qty,harga:hasil,harga_beli:harga_beli};
+      var ser = {
+                  id_barang:id_barang,
+                  qty:qty,
+                  harga_beli:harga_beli,
+                  harga_retail:harga_retail,
+                  harga_lusin:harga_lusin,
+                  harga_koli:harga_koli,
+                  id_gudang:id_gudang,
+                  id_barang_masuk:id_barang_masuk
+                };
+      console.log(ser);
+      
       $.post("<?php echo base_url()?>index.php/"+classnya+"/go_beli",ser,function(x){
         console.log(x);
         eksekusi_controller('<?php echo base_url()?>index.php/'+classnya+'/data_beli',document.title);
       })
+      
     }
 
 }

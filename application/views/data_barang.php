@@ -36,7 +36,7 @@
               <th width="10px">Id Barang</th>           
               <th>Barang</th>                     
               <th>Stok</th>                     
-              <th>Harga Pokok</th>                     
+              <th>Harga Beli</th>                     
               <th>Harga Retail</th>                     
               <th>Harga Lusin</th>                     
               <th>Harga Koli</th>                     
@@ -110,8 +110,8 @@
             <div class="col-sm-8"><input type="text" name="nama_barang" id="nama_barang" required="required" class="form-control" placeholder="nama_barang"></div>
             <div style="clear: both;"></div><br>
         
-        <div class="col-sm-4">Harga Pokok</div>
-            <div class="col-sm-8"><input type="text" name="harga_pokok" id="harga_pokok" required="required" class="form-control nomor" placeholder="harga_pokok" readonly="readonly"></div>
+        <div class="col-sm-4">Harga Beli</div>
+            <div class="col-sm-8"><input type="text" name="harga_pokok" id="harga_pokok" required="required" class="form-control nomor" placeholder="harga_pokok" ></div>
             <div style="clear: both;"></div><br>
         
       <div class="col-sm-4">Harga Retail</div>

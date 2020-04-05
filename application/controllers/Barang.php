@@ -19,7 +19,23 @@ class Barang extends CI_Controller {
 		$this->load->model('m_ambil');
 		$this->load->model('m_pelanggan');
 		$this->load->model('m_ekspedisi');
+		$this->load->model('m_gudang');
 
+	}
+
+
+	public function form_barang_sementara()
+	{
+		$data['all'] = $this->m_barang->m_data();	
+		$data['gudang'] = $this->m_gudang->m_data();		
+		$this->load->view('form_barang_sementara',$data);
+	}
+
+	public function go_simpan_sementara()
+	{
+		$serialize = $this->input->post();
+		$this->db->set($serialize);
+		$this->db->insert('tbl_barang_masuk_tanpa_harga');
 	}
 
 
@@ -352,31 +368,59 @@ class Barang extends CI_Controller {
 
 	public function data_beli()
 	{
-		$data['all'] = $this->m_barang->m_data();	
+		$data['all'] = $this->m_barang->m_data_beli();	
+		$data['gudang'] = $this->m_gudang->m_data();	
 		$this->load->view('data_barang_beli',$data);
+	}
+
+	public function notif()
+	{	
+		header("Access-Control-Allow-Origin: *");
+		header("Access-Control-Allow-Headers: *");
+		header('Content-Type: application/json');	
+		$data['barang_baru'] = $this->m_barang->m_hitung_notif_barang_baru();
+		echo json_encode($data);
+	}
+
+
+	public function stok_gudang($id_gudang)
+	{
+		$data['stok'] = $this->m_barang->m_data_gudang($id_gudang);	
+		$data['gudang'] = $this->m_gudang->m_data();	
+		$this->load->view('stok_gudang',$data);
 	}
 
 	public function go_beli()
 	{
-		$qty = $this->input->post('qty');
-		$harga = $this->input->post('harga');
+		$qty = $this->input->post('qty');		
+		
 		$harga_beli = $this->input->post('harga_beli');
+		$harga_retail = $this->input->post('harga_retail');
+		$harga_lusin = $this->input->post('harga_lusin');
+		$harga_koli = $this->input->post('harga_koli');
 
 		$id_barang = $this->input->post('id_barang');
+		$id_gudang = $this->input->post('id_gudang');
+		
 
-		if($harga>0 && $harga!='')
+
+		if($harga_beli>0 && $harga_beli!='')
 		{
 		$this->db->query("INSERT INTO tbl_barang_transaksi 
 								SET 
 								jenis='masuk', 
 								jumlah='$qty',
 								harga_beli='$harga_beli',
-								id_barang='$id_barang'
+								id_barang='$id_barang',
+								id_gudang='$id_gudang'
 							");			
 		
 		$this->db->query("UPDATE tbl_barang 
 							SET 
-							harga_pokok='$harga' 
+							harga_pokok='$harga_beli', 
+							harga_retail='$harga_retail', 
+							harga_lusin='$harga_lusin', 
+							harga_koli='$harga_koli'
 							WHERE 
 							id='$id_barang'
 						");
@@ -398,6 +442,10 @@ class Barang extends CI_Controller {
 		$this->db->insert('tbl_transaksi');
 		/*********** insert ke transaksi **************/
 
+		/*hapus dari tbl_sementara*/
+		$id_barang_masuk = $this->input->post('id_barang_masuk');
+		$this->db->query("UPDATE tbl_barang_masuk_tanpa_harga SET status='sudah' WHERE id_barang_masuk='$id_barang_masuk'");
+		/*hapus dari tbl_sementara*/
 
 		
 		}

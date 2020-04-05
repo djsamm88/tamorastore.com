@@ -90,7 +90,7 @@
 
         <li class="treeview">
           
-          <a href="#"><i class="fa fa-database"></i> <span>Master Barang</span>
+          <a href="#"><i class="fa fa-database"></i> <span>Master Barang <span class="label label-danger pull-right badge_barang"></span></span>
             <span class="pull-right-container">
                 <i class="fa fa-angle-left pull-right"></i>
               </span>
@@ -106,7 +106,7 @@
             
              <li>
               <a href="#" onclick="eksekusi_controller('<?php echo base_url()?>index.php/barang/data_beli','Pembelian Barang');return false;">
-                <i class="fa fa-link"></i> <span>Barang Masuk</span>
+                <i class="fa fa-link"></i> <span>Barang Masuk <span class="label label-danger pull-right badge_barang_baru"></span></span>
               </a>
             </li>
 
@@ -192,7 +192,13 @@
           <ul class="treeview-menu">
              <li>
               <a href="#" onclick="eksekusi_controller('<?php echo base_url()?>index.php/gudang/data','Master Gudang');return false;">
-                <i class="fa fa-link"></i> <span>Data</span>
+                <i class="fa fa-link"></i> <span>Master</span>
+              </a>
+            </li>
+            
+            <li>
+              <a href="#" onclick="eksekusi_controller('<?php echo base_url()?>index.php/barang/stok_gudang/1','Stok Gudang');return false;">
+                <i class="fa fa-link"></i> <span>Stok Gudang</span>
               </a>
             </li>
 
@@ -352,6 +358,13 @@
         
 
         <?php }?>
+
+
+        <li>
+          <a href="#" onclick="eksekusi_controller('<?php echo base_url()?>index.php/barang/form_barang_sementara','Barang Masuk');return false;">
+            <i class="fa fa-lock"></i> <span>User Gudang</span>
+          </a>
+        </li>
         
         
         <li>
