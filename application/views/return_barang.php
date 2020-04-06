@@ -37,33 +37,62 @@
                 <div class="col-sm-4">
                   Jumlah
                 </div>                
-                <div class="col-sm-8" >
-                  <input type="number" name="jumlah" class="form-control">
+                <div class="col-sm-2" >
+                  <input type="number" name="jumlah" class="form-control" placeholder="jumlah barang">
                 </div>
                 <div style="clear: both;"></div><br>
+
+                <div class="col-sm-4">
+                  Kondisi
+                </div>                
+                <div class="col-sm-8" >
+                  <select name="kondisi" class="form-control" required="">
+                      <option value="">--- Pilih Kondisi ---</option>
+                      <option value="rusak">Rusak</option>
+                      <option value="baik">Baik</option>
+                  </select>
+                </div>
+                <div style="clear: both;"></div><br>
+
+
+                <div class="col-sm-4">
+                  Gudang
+                </div>                
+                <div class="col-sm-8" >
+                  <select name="id_gudang" class="form-control" required="">
+                      <option value="">--- Pilih Gudang ---</option>
+                      <?php 
+                        foreach ($this->m_gudang->m_data() as $gud) {
+                          echo "<option value='$gud->id_gudang'>$gud->nama_gudang</option>";
+                        }
+                      ?>
+                  </select>
+                </div>
+                <div style="clear: both;"></div><br>
+
+                
 
                 <div class="col-sm-4">
                   Total Uang Kembali
                 </div>
                 <div class="col-sm-8" >
-                  <input type="text" name="uang_kembali" class="form-control nomor">
+                  <input type="text" name="uang_kembali" class="form-control nomor" placeholder="Uang kembali">
                 </div>
                 <div style="clear: both;"></div><br>
 
 
                 <div class="col-sm-4">
-                  Nama Customer                
-                </div>
+                  Nama Pelanggan
+                </div>                
                 <div class="col-sm-8" >
-                  <input type="text" name="nama" class="form-control ">
-                </div>
-                <div style="clear: both;"></div><br>
-                
-                <div class="col-sm-4">
-                  HP Customer                
-                </div>
-                <div class="col-sm-8" >
-                  <input type="text" name="hp" class="form-control">
+                  <select name="id_pelanggan" class="form-control" required="">
+                      <option value="">--- Pilih Pelanggan ---</option>
+                      <?php 
+                        foreach ($this->m_pelanggan->m_data() as $pel) {
+                          echo "<option value='$pel->id_pelanggan'>$pel->nama_pembeli</option>";
+                        }
+                      ?>
+                  </select>
                 </div>
                 <div style="clear: both;"></div><br>
 
@@ -72,7 +101,7 @@
                   Keterangan                
                 </div>
                 <div class="col-sm-8" >
-                  <input type="text" name="ket" class="form-control" required="">
+                  <textarea name="ket" class="form-control" required="" placeholder="Keterangan pengembalian"></textarea>
                 </div>
                 <div style="clear: both;"></div><br>
                 
@@ -154,8 +183,8 @@
                 <td>$x->nama_barang</td>                
                 <td>$x->jumlah</td>                
                 <td>".rupiah($x->uang_kembali)."</td>                
-                <td>$x->nama</td>                
-                <td>$x->hp</td>                
+                <td>$x->nama_pembeli</td>                
+                <td>$x->hp_pembeli</td>                
                 <td>$x->ket</td>                
                 <td>$x->tgl_trx</td>                
                 

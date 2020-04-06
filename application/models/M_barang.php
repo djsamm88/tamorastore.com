@@ -108,6 +108,41 @@ if (!defined('BASEPATH'))exit('No direct script access allowed');
 		return $q;
 	}
 
+	public function m_notif_stok($id_gudang=null)
+	{
+		if($id_gudang!=null)
+		{
+			$if = " AND b.id_gudang='$id_gudang'";
+		}else{
+			$if ="";
+		}
+
+		$q = $this->db->query("
+							
+								SELECT a.*,IFNULL(b.qty,0) AS qty,b.id_gudang,c.nama_gudang,c.reminder
+								FROM tbl_barang a
+								INNER JOIN(
+										SELECT 
+											a.id_barang,a.id_gudang, 
+											IFNULL(a.qty,0)-IFNULL(b.qty,0) AS qty
+											 FROM 
+											(SELECT id_barang,SUM(jumlah) AS qty,id_gudang FROM `tbl_barang_transaksi` WHERE jenis='masuk' GROUP BY id_barang
+											)a 
+											LEFT JOIN 
+											(SELECT id_barang,SUM(jumlah) AS qty FROM `tbl_barang_transaksi` WHERE jenis='keluar' GROUP BY id_barang
+											)b 
+											ON a.id_barang=b.id_barang 
+								)b
+								ON a.id =b.id_barang	
+								LEFT JOIN tbl_gudang c ON b.id_gudang=c.id_gudang								
+								
+								WHERE c.reminder > b.qty $if
+
+							
+					");
+		return $q;
+	}
+
 
 	public function m_data_beli()
 	{
@@ -146,9 +181,10 @@ if (!defined('BASEPATH'))exit('No direct script access allowed');
 
 	public function m_return_barang()
 	{
-		$q = $this->db->query("SELECT a.*,b.* FROM tbl_barang_return a
-								LEFT JOIN tbl_barang b 
-								ON a.id_barang=b.id
+		$q = $this->db->query("SELECT a.*,b.*,c.* 
+								FROM tbl_barang_return a
+								LEFT JOIN tbl_barang b ON a.id_barang=b.id
+								LEFT JOIN tbl_pelanggan c ON a.id_pelanggan=c.id_pelanggan
 								ORDER BY a.id DESC
 					");
 		return $q->result();
@@ -219,7 +255,7 @@ if (!defined('BASEPATH'))exit('No direct script access allowed');
 	public function m_lap_penjualan()
 	{
 		$q = $this->db->query("SELECT grup_penjualan,SUM(sub_total_jual) AS total, diskon,tgl_transaksi,nama_pembeli,hp_pembeli,nama_packing,tgl_transaksi,tgl_trx_manual,
-			harga_ekspedisi,transport_ke_ekspedisi 
+			harga_ekspedisi,transport_ke_ekspedisi,id_pelanggan 
 			FROM `tbl_barang_transaksi` 
 			WHERE jenis='keluar'
 			GROUP BY grup_penjualan

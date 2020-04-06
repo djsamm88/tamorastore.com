@@ -32,8 +32,8 @@
         <tr>
               
               <th>No</th>
-               <th width="100px">id_gudang</th>
-                <th>nama_gudang</th>
+               <th width="100px">id gudang</th>
+                <th>nama gudang</th>
                 <th>reminder</th>                
                 <th>View</th>                
               
@@ -46,6 +46,12 @@
         foreach($gudang as $x)
         {
           $btn = "<button class='btn btn-warning btn-xs' onclick='tampil($x->id_gudang);return false;'>Tampil</button>";
+
+          $yg_warning = $this->m_barang->m_notif_stok($x->id_gudang)->num_rows();
+
+          $rem = $yg_warning>0?"<span class='label label-danger'>$yg_warning</span>":"0";
+          
+
           $no++;
 
             echo (" 
@@ -54,7 +60,7 @@
                 <td>$no</td>
                 <td>$x->id_gudang</td>
                 <td>$x->nama_gudang</td>
-                <td>".rupiah($x->reminder)."</td>                
+                <td>$rem</td>                
                 <td>
                   $btn
                 </td>
@@ -79,7 +85,7 @@
                <th width="100px">Id barang</th>
                 <th>Nama barang</th>
                 <th>Stok Barang</th>                
-                <th>Reminder</th>                
+                <th>Data Reminder</th>                
                 <th>Gudang</th>                
               
               
@@ -91,11 +97,15 @@
         foreach($stok->result() as $s)
         {
           
+          $class = $s->reminder > $s->qty?"danger":"";
+
+
+
           $no++;
 
             echo (" 
               
-              <tr>
+              <tr class='$class'>
                 <td>$no</td>
                 <td>$s->id</td>
                 <td>$s->nama_barang</td>

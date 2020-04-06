@@ -2,7 +2,7 @@
 <!-- Content Header (Page header) -->
     <section class="content-header">
       <h1 id="judul">
-        Selamat datang di Sistem Informasi 
+        Selamat datang di POS
         <small></small>
       </h1>      
     </section>
@@ -36,6 +36,7 @@
               <th>Tanggal</th>                     
               <th>Tgl.Manual</th>                     
               <th>Kode Trx.</th>                     
+              <th>Kepada</th>                     
               <th>Sub Total</th>                     
               <th>Diskon</th>                     
               <th>Ekspedisi</th>                     
@@ -61,6 +62,7 @@
                 <td>".($x->tgl_trx_manual)."</td>
 
                 <td>$x->grup_penjualan</td>                
+                <td>$x->nama_pembeli -[ $x->id_pelanggan ]</td>                
                 <td align=right>".rupiah($x->total)."</td>                
                 <td align=right>".rupiah($x->diskon)."</td>                
                 <td align=right>".rupiah($x->harga_ekspedisi)."</td>                

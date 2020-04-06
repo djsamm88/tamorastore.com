@@ -344,7 +344,7 @@ class Barang extends CI_Controller {
 
 
 		/*********** insert ke transaksi **************/	
-		$ket = "Kpd: [".$data['nama']."] nama barang: [".$nama_barang."] id_barang:[".$data['id_barang']."] Jumlah:[".($data['jumlah'])."]  -".$data['ket'];
+		$ket = "Kpd: [id_pelanggan:".$data['id_pelanggan']."] nama barang: [".$nama_barang."] id_barang:[".$data['id_barang']."] Jumlah:[".($data['jumlah'])."]  -".$data['ket'];
 
 		$ser_trx = array(
 						"id_group"=>"6",							
@@ -356,6 +356,24 @@ class Barang extends CI_Controller {
 		$this->db->set($ser_trx);
 		$this->db->insert('tbl_transaksi');
 		/*********** insert ke transaksi **************/
+
+		/********** jika kondisi=baik masuk ke barang ***************/
+		if($data['kondisi']=='baik')
+		{
+			
+			$qty 		= $data['jumlah'];
+			$id_gudang	= $data['id_gudang'];
+			$id_barang 	= $data['id_barang'];
+
+			$this->db->query("INSERT INTO tbl_barang_transaksi 
+								SET 
+								jenis='masuk', 
+								jumlah='$qty',								
+								id_barang='$id_barang',
+								id_gudang='$id_gudang'
+							");
+		}
+		/********** jika kondisi=baik masuk ke barang ***************/
 	}
 
 
@@ -379,14 +397,44 @@ class Barang extends CI_Controller {
 		header("Access-Control-Allow-Headers: *");
 		header('Content-Type: application/json');	
 		$data['barang_baru'] = $this->m_barang->m_hitung_notif_barang_baru();
+
+		/******* stok gudang *****/
+		$rem = array();		
+		$semu_stok_gudang = 0;
+		foreach ($this->m_gudang->m_data() as $key) {
+			$yg_warning = $this->m_barang->m_notif_stok($key->id_gudang)->num_rows();
+			$arr['id_gudang'] = $key->id_gudang;
+			$arr['warning'] = $yg_warning;
+			array_push($rem, $arr);
+			$semu_stok_gudang+=$yg_warning;
+		}
+		
+		$data['stok_gudang'] = $rem;
+		$data['semu_stok_gudang'] = $semu_stok_gudang;
+		/******* stok gudang *****/
 		echo json_encode($data);
 	}
+
 
 
 	public function stok_gudang($id_gudang)
 	{
 		$data['stok'] = $this->m_barang->m_data_gudang($id_gudang);	
-		$data['gudang'] = $this->m_gudang->m_data();	
+		$data['gudang'] = $this->m_gudang->m_data();
+
+		/****** array gudang yg kosong *****/
+		$q = $this->m_barang->m_notif_stok();
+		$warning=array();
+		foreach ($q->result() as $key) {
+			
+			if($key->reminder > $key->qty)
+			{
+				array_push($warning, $key->id_gudang);
+			}
+		}
+		$data['warning'] = array_unique($warning);	
+		/****** array gudang yg kosong *****/
+
 		$this->load->view('stok_gudang',$data);
 	}
 

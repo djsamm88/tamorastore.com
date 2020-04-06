@@ -218,6 +218,47 @@ if (!defined('BASEPATH'))exit('No direct script access allowed');
 		return $q->result();
 	}
 
+	public function m_jurnal_pelanggan($id_pelanggan)
+	{
+		$q = $this->db->query("
+							SELECT a.*,
+								IFNULL(a.debet,0)-IFNULL(a.kredit,0) AS saldo
+								FROM
+								(
+									SELECT
+									a.id,
+									a.tanggal,
+								    a.nama AS group_trx,
+								    a.keterangan,
+									a.debet,
+									a.kredit,
+									a.id_pelanggan,
+									a.id_group,
+									a.url_bukti
+
+									FROM
+									(
+										SELECT a.*,
+										CASE WHEN a.jenis='masuk' THEN a.jumlah  END AS debet,
+										CASE WHEN a.jenis='keluar' THEN a.jumlah  END AS kredit
+										FROM 
+										(
+										SELECT a.*,(a.tgl_update) AS tanggal,b.nama,b.jenis FROM `tbl_transaksi` a 
+										INNER JOIN tbl_group_transaksi b 
+										ON a.id_group=b.id
+										)a
+										WHERE (a.jumlah*1)<>0
+									)a 
+								)a
+							WHERE 
+							a.id_pelanggan='$id_pelanggan'
+							AND (a.id_group='17' OR a.id_group='18')
+							
+							
+						");
+		return $q->result();
+	}
+
 
 	public function m_laba($tgl_awal,$tgl_akhir)
 	{

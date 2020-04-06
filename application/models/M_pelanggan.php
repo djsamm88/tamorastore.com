@@ -40,4 +40,20 @@ class M_pelanggan extends CI_Model {
 	}
 
 
+
+
+	public function trx_by_pengguna($id_pelanggan)
+	{
+		$q = $this->db->query("SELECT * FROM `tbl_transaksi` WHERE id_group='8' AND id_pelanggan='$id_pelanggan'");
+		return $q->result();
+	}
+
+	public function insert_trx($serialize)
+	{
+		$this->db->set($serialize);
+		$this->db->insert('tbl_transaksi');
+		return $this->db->insert_id();
+	}
+
+
 }

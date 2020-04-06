@@ -27,6 +27,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
   <link rel="stylesheet" href="<?php echo base_url()?>assets/jqueryui.css">
 
   <link rel="stylesheet" href="<?php echo base_url()?>assets/datetimepicker/datetimepicker.css">
+  <link rel="stylesheet" href="<?php echo base_url()?>assets/toastr/toastr.min.css">
 
   <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
   <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -306,6 +307,9 @@ desired effect
 <script type="text/javascript" src="<?php echo base_url()?>assets/datetimepicker/datetimepicker.pt-BR.js"></script>
 
 
+<script type="text/javascript" src="<?php echo base_url()?>assets/toastr/toastr.min.js"></script>
+
+
 
 <script type="text/javascript">
   // To make Pace works on Ajax calls
@@ -323,16 +327,66 @@ desired effect
 
   
   $(document).ready(function(){
-    notif();  
+      
+    setTimeout(function() {
+         notif();
+    }, 3000);
+
+    /******** toastr**********/
+    toastr.options = {
+      "closeButton": true,
+      "debug": false,
+      "newestOnTop": false,
+      "progressBar": false,
+      "positionClass": "toast-bottom-right",
+      "preventDuplicates": false,      
+      "showDuration": "300",
+      "hideDuration": "300",
+      "timeOut": "20000",
+      "extendedTimeOut": "1000",
+      "showEasing": "swing",
+      "hideEasing": "linear",
+      "showMethod": "fadeIn",
+      "hideMethod": "fadeOut"
+    }
+    /******** toastr**********/
   })
   function notif()
   {
     $.get("<?php echo base_url()?>index.php/barang/notif",function(e){
-      $(".badge_barang_baru").html(e.barang_baru);
+      
+
+      $(".badge_barang_baru").html("");
+      if(e.barang_baru != "0" || e.barang_baru!="")
+      {
+        $(".badge_barang_baru").html(e.barang_baru);
+        toastr["error"]("Ada barang baru dari gudang, atur harganya!!!", "Barang Baru",{
+            onclick: function() {
+                  eksekusi_controller('<?php echo base_url()?>index.php/barang/data_beli','Pembelian Barang');
+              }});
+      }
+
 
       var all_notif_barang = e.barang_baru;
-      $(".badge_barang").html(all_notif_barang);
-      console.log(e);
+      
+      $(".badge_barang").html("");
+      if(all_notif_barang!="0" || all_notif_barang!="")
+      {
+        $(".badge_barang").html(all_notif_barang);  
+      }
+
+      
+      $(".badge_gudang").html("");
+      if(e.semu_stok_gudang != "" || e.semu_stok_gudang!="")
+      {
+        $(".badge_gudang").html(e.semu_stok_gudang);
+        //toastr.warning(e.semu_stok_gudang);
+        toastr["warning"]("Periksa stok barang di gudang!!!", "Gudang",{
+            onclick: function() {
+                  eksekusi_controller('<?php echo base_url()?>index.php/barang/stok_gudang/1','Stok Gudang');
+              }});
+      }
+      
     })
   }
 

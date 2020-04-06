@@ -152,6 +152,12 @@
               </a>
             </li>
 
+            <li>
+              <a href="#" onclick="eksekusi_controller('<?php echo base_url()?>index.php/Pelanggan/transaksi','Utang/Piutang');return false;">
+                <i class="fa fa-link"></i> <span>Transaksi</span>
+              </a>
+            </li>
+
             
             
           </ul>
@@ -183,7 +189,7 @@
 
         <li class="treeview">
           
-          <a href="#"><i class="fa fa-institution"></i> <span>Gudang</span>
+          <a href="#"><i class="fa fa-institution"></i> <span>Gudang <span class="label label-warning pull-right badge_gudang"></span></span></span>
             <span class="pull-right-container">
                 <i class="fa fa-angle-left pull-right"></i>
               </span>
@@ -198,7 +204,7 @@
             
             <li>
               <a href="#" onclick="eksekusi_controller('<?php echo base_url()?>index.php/barang/stok_gudang/1','Stok Gudang');return false;">
-                <i class="fa fa-link"></i> <span>Stok Gudang</span>
+                <i class="fa fa-link"></i> <span>Stok Gudang <span class="label label-warning pull-right badge_gudang"></span></span></span>
               </a>
             </li>
 

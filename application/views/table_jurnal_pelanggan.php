@@ -18,7 +18,7 @@
 
 <div class="box">
         <div class="box-header with-border">
-          <h3 class="box-title" id="judul2">Transaksi</h3>
+          <h3 class="box-title" id="judul2">Transaksi Pengguna</h3>
 
           <div class="box-tools pull-right">
             <button type="button" class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip"
@@ -30,17 +30,17 @@
         </div>
         <div class="box-body">
           <div class="alert alert-info">
-          <form id="go_trx_jurnal">
-              <div class="col-sm-5">
-                  <input type="text" class="form-control datepicker" name="tgl_awal" id="tgl_awal"  value="<?php echo $tgl_awal ?>" >
+          
+              <div class="col-sm-4">
+                  <?php echo $pelanggan->nama_pembeli?>
               </div>
-              <div class="col-sm-5">
-                <input type="text" class="form-control datepicker" name="tgl_akhir" id="tgl_akhir"  value="<?php echo $tgl_akhir ?>">
+              <div class="col-sm-4">
+                <?php echo $pelanggan->hp_pembeli?>
               </div>
-              <div class="col-sm-2">
-                <input type="submit" class="btn btn-primary btn-block" value="Go">
+              <div class="col-sm-4">
+                <?php echo rupiah($pelanggan->saldo)?>
               </div>
-          </form>
+          
           <div style="clear: both"></div>
         </div>
          <table class="table table-bordered" id="tbl_jurnal">
@@ -51,6 +51,7 @@
                 <th>Tanggal</th>
                 <th>Group Trx</th>
                 <th>Keterangan</th>
+                <th>Bukti</th>
                 <th>Debet</th>
                 <th>Kredit</th>
                 <th>Saldo</th>
@@ -75,6 +76,8 @@
                     <td>".tglindo($key->tanggal)."</td>
                     <td>$key->group_trx</td>
                     <td>$key->keterangan</td>
+                    <td><a href='".base_url()."/uploads/$key->url_bukti' target='blank' >$key->url_bukti</a></td>
+
                     <td style='text-align:right'>".rupiah($key->debet)."</td>
                     <td style='text-align:right'>".rupiah($key->kredit)."</td>
                     <td style='text-align:right'>".rupiah($key->saldo)."</td>
@@ -86,7 +89,7 @@
            </tbody>
            <tfoot>
              <tr>
-                <th colspan='5' style='text-align:right'><b>Total</b></th>
+                <th colspan='6' style='text-align:right'><b>Total</b></th>
                 <th style='text-align:right'><b>Rp.<?php echo rupiah($tot_debet)?></b></th>
                 <th style='text-align:right'><b>Rp.<?php echo rupiah($tot_kredit)?></b></th>
                 <th style='text-align:right'><b>Rp.<?php echo rupiah($total)?></b></th>
@@ -97,79 +100,16 @@
 
 
       </div>
-
+      <!--
       <input type="button" class="btn btn-primary" value="Download" id="download_pdf">
+      -->
       <!-- /.box -->
     </div>
 </section>
     <!-- /.content -->
 
 <script type="text/javascript">
-  /*
-  $(document).ready(function(){
-    $('#tbl_jurnal').dataTable(
-      {
-        "footerCallback": function ( row, data, start, end, display ) {
-            var api = this.api(), data;
- 
-            // Remove the formatting to get integer data for summation
-            var intVal = function ( i ) {
-                return typeof i === 'string' ?
-                    i.replace(/[\Rp.,]/g, '')*1 :
-                    typeof i === 'number' ?
-                        i : 0;
-            };
- 
-            // Total over all pages
-            total = api
-                .column( 5 )
-                .data()
-                .reduce( function (a, b) {
-                    return intVal(a) + intVal(b);
-                }, 0 );
- 
-            // Total over this page
-            pageTotal = api
-                .column( 5, { page: 'current'} )
-                .data()
-                .reduce( function (a, b) {
-                    return intVal(a) + intVal(b);
-                }, 0 );
- 
-            // Update footer
-            $( api.column( 5 ).footer() ).html(
-                'Rp.'+formatRupiah(pageTotal) +' (Rp.'+ formatRupiah(total) +')'
-            );
-        }
-    } );
-  })
-
-*/
-function formatRupiah(x) {
-    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-}
-$('.datepicker').datepicker({
-  autoclose: true,
-  format: 'yyyy-mm-dd' 
-})
-
-$("#go_trx_jurnal").on("submit",function(){
-    var tgl_awal   = $("#tgl_awal").val();
-    var tgl_akhir  = $("#tgl_akhir").val();
-    if( (new Date(tgl_awal).getTime() > new Date(tgl_akhir).getTime()))
-    {
-      alert("Perhatikan pengisian tanggal. Ada yang salah.");
-      return false;
-    }
-
-    eksekusi_controller('<?php echo base_url()?>index.php/laporan_keuangan/laporan_jurnal/?tgl_awal='+tgl_awal+'&tgl_akhir='+tgl_akhir,'Laporan Jurnal');
-  return false;
-})
-
-$("html, body").animate({ scrollTop: 0 }, "slow");
-
-
-
+  
 $("#download_pdf").on("click",function(){
   var ser = $("#go_trx_jurnal").serialize();
   var url="<?php echo base_url()?>index.php/laporan_keuangan/laporan_jurnal_pdf/?"+ser;

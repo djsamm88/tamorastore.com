@@ -180,23 +180,24 @@ function go_beli(ini)
     //console.log((harga_beli));
     if(harga_beli == "")
     {
-      alert("Harga tidak boleh kosong!!!");
+      
+      toastr["error"]("Harga tidak boleh kosong!!!", "Error");
       ini.parent().parent().find("#harga_beli").focus();
       return false;
     }
 
     if(qty == "")
     {
-      ini.parent().parent().find("#qty").focus();
-      alert("Qty tidak boleh kosong!!!");
+      ini.parent().parent().find("#qty").focus();      
+      toastr["error"]("Qty tidak boleh kosong!!!", "Error");
       
       return false;
     }
 
     if(id_gudang =="")
     {
-      ini.parent().parent().find("#id_gudang").focus();
-      alert("Gudang harus dipilih!");
+      ini.parent().parent().find("#id_gudang").focus();      
+      toastr["error"]("Gudang harus dipilih!!!", "Error");
       return false;
     }
 
@@ -227,6 +228,8 @@ function go_beli(ini)
       $.post("<?php echo base_url()?>index.php/"+classnya+"/go_beli",ser,function(x){
         console.log(x);
         eksekusi_controller('<?php echo base_url()?>index.php/'+classnya+'/data_beli',document.title);
+        toastr["success"]("Harga telah diatur.", "Sukses");
+        notif();
       })
       
     }

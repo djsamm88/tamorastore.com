@@ -192,16 +192,16 @@ function go_beli(ini)
     
     if(qty == "")
     {
-      ini.parent().parent().find("#qty").focus();
-      alert("Qty tidak boleh kosong!!!");
-      
+      ini.parent().parent().find("#qty").focus();      
+      toastr["error"]("Qty tidak boleh kosong!!!", "Error");
       return false;
     }
 
     if(id_gudang =="")
     {
       ini.parent().parent().find("#id_gudang").focus();
-      alert("Gudang harus dipilih!");
+      
+      toastr["error"]("Gudang harus dipilih!!!", "Error");
       return false;
     }
 
@@ -211,9 +211,10 @@ function go_beli(ini)
     {
       var ser = {id_barang:id_barang,qty:qty,id_gudang:id_gudang};
       $.post("<?php echo base_url()?>index.php/"+classnya+"/go_simpan_sementara",ser,function(x){
-        console.log(x);
-        alert("Barang telah ditambahkan.");
+        console.log(x);        
+        toastr["success"]("Barang telah ditambahkan.", "Sukses");
         eksekusi_controller('<?php echo base_url()?>index.php/barang/form_barang_sementara','Barang Masuk');
+        notif();
       })
     }
 

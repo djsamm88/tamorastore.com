@@ -27,6 +27,50 @@ class Pelanggan extends CI_Controller {
 		$this->load->view('data_pelanggan',$data);
 	}
 
+	public function transaksi()
+	{
+		$data['all'] = $this->m_pelanggan->m_data();			
+		$this->load->view('transaksi_pelanggan.php',$data);
+	}
+
+	public function trx_by_id($id_pelanggan)
+	{		
+		
+		header("Access-Control-Allow-Origin: *");
+		header("Access-Control-Allow-Headers: *");
+		header('Content-Type: application/json');	
+		$data['all'] = $this->m_pelanggan->trx_by_pengguna($id_pelanggan);
+		echo json_encode($data['all']);
+	}
+
+	public function simpan_trx()
+	{
+		$serialize = $this->input->post();
+		$serialize['url_bukti'] = upload_file('url_bukti');
+
+		//var_dump($serialize);
+		$serialize['jumlah'] = hanya_nomor($serialize['jumlah']);
+		$serialize['keterangan'] = $serialize['keterangan']." - A.n : ".$serialize['nama_pembeli']." - ID :".$serialize['id_pelanggan'];
+
+		unset($serialize['nama_pembeli']);
+		$this->m_pelanggan->insert_trx($serialize);
+
+		$jumlah = $serialize['jumlah'];
+		$id_pelanggan = $serialize['id_pelanggan'];
+		if($serialize['id_group']=='17')
+		{
+			//tambah utang
+			$this->db->query("UPDATE tbl_pelanggan SET saldo=saldo-$jumlah WHERE id_pelanggan='$id_pelanggan'");
+		}
+
+		if($serialize['id_group']=='18')
+		{
+			//bayar utang
+			$this->db->query("UPDATE tbl_pelanggan SET saldo=saldo+$jumlah WHERE id_pelanggan='$id_pelanggan'");
+		}
+
+	}
+
 	public function by_id($id_pelanggan)
 	{
 		header('Content-Type: application/json');

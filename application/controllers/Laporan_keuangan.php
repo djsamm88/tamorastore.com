@@ -16,6 +16,8 @@ class Laporan_keuangan extends CI_Controller {
 		date_default_timezone_set("Asia/jakarta");
 		//$this->load->library('datatables');
 		$this->load->model('m_laporan_keuangan');
+		$this->load->model('m_pelanggan');
+
 
 	}
 
@@ -119,6 +121,14 @@ class Laporan_keuangan extends CI_Controller {
 		$data['tgl_awal'] = $tgl_awal;
 		$data['tgl_akhir'] = $tgl_akhir;
 		$this->load->view('table_jurnal',$data);
+	}
+
+
+	public function laporan_jurnal_pelanggan($id_pelanggan)
+	{
+		$data['all'] = $this->m_laporan_keuangan->m_jurnal_pelanggan($id_pelanggan);		
+		$data['pelanggan'] = $this->m_pelanggan->m_by_id($id_pelanggan)[0];		
+		$this->load->view('table_jurnal_pelanggan',$data);
 	}
 
 
