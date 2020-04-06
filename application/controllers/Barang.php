@@ -29,6 +29,7 @@ class Barang extends CI_Controller {
 		$data['all'] = $this->m_barang->m_data();	
 		$data['gudang'] = $this->m_gudang->m_data();		
 		$this->load->view('form_barang_sementara',$data);
+		
 	}
 
 	public function go_simpan_sementara()
@@ -104,6 +105,8 @@ class Barang extends CI_Controller {
 			$serialize['keterangan']	= $data['keterangan'];
 
 			$serialize['diskon'] 		= hanya_nomor($data['diskon']);
+			$serialize['saldo'] 		= hanya_nomor($data['saldo']);
+
 			$serialize['bayar'] 		= hanya_nomor($data['bayar']);
 			$serialize['transport_ke_ekspedisi'] = hanya_nomor($data['transport_ke_ekspedisi']);
 			$serialize['harga_ekspedisi'] 		 = hanya_nomor($data['harga_ekspedisi']);
@@ -114,6 +117,7 @@ class Barang extends CI_Controller {
 			$serialize['qty_jual']		= $data['jumlah'][$key];
 			$serialize['jum_per_koli']	= $barang->jum_per_koli;
 			$serialize['harga_beli']	= $barang->harga_pokok;
+			$serialize['id_gudang']		= '1';
 			
 
 
@@ -128,9 +132,10 @@ class Barang extends CI_Controller {
 		}
 
 
+		
+
 		$serialize['transport_ke_ekspedisi'] = hanya_nomor($data['transport_ke_ekspedisi']);
 		$serialize['harga_ekspedisi'] 		 = hanya_nomor($data['harga_ekspedisi']);
-
 
 		/*********** insert ke transaksi **************/	
 		$ket = "Kpd: [".$data['nama_pembeli']."] - Kode TRX:[".$data['grup_penjualan']."] 
@@ -170,8 +175,39 @@ class Barang extends CI_Controller {
 
 		}		
 		/********* insert diskon **********/
+		
+
+		//utang/piutang
+		if(hanya_nomor($data['saldo'])!=0)
+		{
+			if($data['saldo']<0)
+			{
+				$ser_saldo['id_group']='18';	
+			}else{
+				$ser_saldo['id_group']='17';	
+			}
+			
+			
+			
+			$this->db->query("UPDATE tbl_pelanggan SET saldo=0 WHERE id_pelanggan='$id_pelanggan'");
+
+			$jumlah = hanya_nomor($data['saldo']);			
+			$ser_saldo['jumlah'] 		= str_replace("-", "", $jumlah);
+			$ser_saldo['keterangan'] 	= "Saldo potong langsung saat belanja dengan ID TRX:"
+										  .$data['grup_penjualan']." - A.n : "
+										  .$data['nama_pembeli']." - ID :"
+										  .$id_pelanggan;
+
+			$ser_saldo['id_referensi'] = $data['grup_penjualan'];
+			$ser_saldo['id_pelanggan'] = $id_pelanggan;
+
+			$this->db->set($ser_saldo);
+			$this->db->insert('tbl_transaksi');
+		}
+		//utang/piutang
 
 		/********* insert transport_ke_ekspedisi **********/
+		/*
 		if(hanya_nomor($data['transport_ke_ekspedisi'])>0)
 		{
 			$ser_trx_diskon = array(
@@ -184,10 +220,7 @@ class Barang extends CI_Controller {
 			$this->db->insert('tbl_transaksi');
 
 		}		
-		/********* insert transport_ke_ekspedisi **********/
-
-
-		/********* insert harga_ekspedisi **********/
+		
 		if(hanya_nomor($data['harga_ekspedisi'])>0)
 		{
 			$ser_trx_diskon = array(
@@ -200,10 +233,7 @@ class Barang extends CI_Controller {
 			$this->db->insert('tbl_transaksi');
 
 		}		
-		/********* insert harga_ekspedisi **********/
 
-
-		/********* insert transport_ke_ekspedisi_keluar **********/
 		if(hanya_nomor($data['transport_ke_ekspedisi'])>0)
 		{
 			$ser_trx_diskon = array(
@@ -216,10 +246,7 @@ class Barang extends CI_Controller {
 			$this->db->insert('tbl_transaksi');
 
 		}		
-		/********* insert transport_ke_ekspedisi_keluar **********/
-
-
-		/********* insert harga_ekspedisi **********/
+		
 		if(hanya_nomor($data['harga_ekspedisi'])>0)
 		{
 			$ser_trx_diskon = array(
@@ -232,6 +259,7 @@ class Barang extends CI_Controller {
 			$this->db->insert('tbl_transaksi');
 
 		}		
+		*/
 		/********* insert harga_ekspedisi **********/
 		
 
@@ -240,7 +268,7 @@ class Barang extends CI_Controller {
 
 	public function form_penjualan()
 	{
-		$data['all'] = $this->m_barang->m_data();		
+		$data['all'] = $this->m_barang->m_data_gudang(1)->result();		
 		$data['pelanggan'] = $this->m_pelanggan->m_data();	
 		$data['eksepedisi'] = $this->m_ekspedisi->m_data();	
 		$this->load->view('form_penjualan_barang',$data);
@@ -376,6 +404,35 @@ class Barang extends CI_Controller {
 		/********** jika kondisi=baik masuk ke barang ***************/
 	}
 
+	public function pindah_gudang()
+	{
+		$data = $this->input->post();
+
+		$qty 		= $data['jumlah'];
+		$id_gudang	= $data['id_gudang'];		
+		$id_barang 	= $data['id_barang'];
+
+		//tambah ke gudang baru
+		$this->db->query("INSERT INTO tbl_barang_transaksi 
+							SET 
+							jenis='masuk', 
+							jumlah='$qty',								
+							id_barang='$id_barang',
+							id_gudang='$id_gudang'
+						");
+
+		//kurangi dari gudang lama
+		$id_gudang_lama	= $data['id_gudang_lama'];
+		$this->db->query("INSERT INTO tbl_barang_transaksi 
+							SET 
+							jenis='keluar', 
+							jumlah='$qty',								
+							id_barang='$id_barang',
+							id_gudang='$id_gudang_lama'
+						");
+	
+	}
+
 
 	public function lap_penjualan()
 	{
@@ -410,7 +467,9 @@ class Barang extends CI_Controller {
 		}
 		
 		$data['stok_gudang'] = $rem;
-		$data['semu_stok_gudang'] = $semu_stok_gudang;
+		//$data['semu_stok_gudang'] = $semu_stok_gudang;
+		$data['semu_stok_gudang'] = $this->m_barang->m_notif_stok(1)->num_rows();
+		
 		/******* stok gudang *****/
 		echo json_encode($data);
 	}
@@ -515,6 +574,16 @@ class Barang extends CI_Controller {
 		echo json_encode($data['all']);
 	}
 
+
+	public function stok_gudang_by_id()
+	{
+		$id_barang = $this->input->get('id_barang');
+		$id_gudang = $this->input->get('id_gudang');
+		header('Content-Type: application/json');
+		$data['all'] = $this->m_barang->m_stok_gudang_by_id($id_barang,$id_gudang)->result();
+		echo json_encode($data['all']);
+
+	}
 
 	public function simpan_form()
 	{

@@ -524,6 +524,6 @@ $config['proxy_ips'] = '';
 
 
 $config['app_name']="APLIKASI KASIR";
-$config['app_client1']="TOKO AN-NAHLA";
+$config['app_client1']="TAMORA STORE";
 $config['app_client2']="Medan";
 $config['app_client3']="Sumatera Utara";

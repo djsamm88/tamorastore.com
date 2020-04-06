@@ -274,6 +274,9 @@
 
         
 
+        
+
+
 
 
 
@@ -286,6 +289,33 @@
 
         
         
+
+
+        <li class="treeview">
+          
+          <a href="#"><i class="fa fa-institution"></i> <span>User Gudang <span class="label label-warning pull-right badge_gudang"></span></span></span>
+            <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+          </a>
+
+          <ul class="treeview-menu">
+             <li>
+              <a href="#" onclick="eksekusi_controller('<?php echo base_url()?>index.php/barang/form_barang_sementara','Barang Masuk');return false;">
+                <i class="fa fa-lock"></i> <span>Barang Masuk</span>
+              </a>
+            </li>
+            
+            <li>
+              <a href="#" onclick="eksekusi_controller('<?php echo base_url()?>index.php/barang/stok_gudang/1','Stok Gudang');return false;">
+                <i class="fa fa-link"></i> <span>Stok Gudang <span class="label label-warning pull-right badge_gudang"></span></span></span>
+              </a>
+            </li>
+
+            
+            
+          </ul>
+        </li>
         <?php 
           }
 
@@ -366,11 +396,47 @@
         <?php }?>
 
 
-        <li>
-          <a href="#" onclick="eksekusi_controller('<?php echo base_url()?>index.php/barang/form_barang_sementara','Barang Masuk');return false;">
-            <i class="fa fa-lock"></i> <span>User Gudang</span>
+        
+
+
+        <?php 
+          if($this->session->userdata('level')=='3')
+          {?>
+
+
+
+
+        <li class="treeview">
+          
+          <a href="#"><i class="fa fa-institution"></i> <span>User Gudang <span class="label label-warning pull-right badge_gudang"></span></span></span>
+            <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
           </a>
+
+          <ul class="treeview-menu">
+             <li>
+              <a href="#" onclick="eksekusi_controller('<?php echo base_url()?>index.php/barang/form_barang_sementara','Barang Masuk');return false;">
+                <i class="fa fa-lock"></i> <span>Barang Masuk</span>
+              </a>
+            </li>
+            
+            <li>
+              <a href="#" onclick="eksekusi_controller('<?php echo base_url()?>index.php/barang/stok_gudang/1','Stok Gudang');return false;">
+                <i class="fa fa-link"></i> <span>Stok Gudang <span class="label label-warning pull-right badge_gudang"></span></span></span>
+              </a>
+            </li>
+
+            
+            
+          </ul>
         </li>
+
+        
+
+        <?php }?>
+
+
         
         
         <li>

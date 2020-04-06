@@ -342,7 +342,7 @@ desired effect
       "preventDuplicates": false,      
       "showDuration": "300",
       "hideDuration": "300",
-      "timeOut": "20000",
+      "timeOut": "10000",
       "extendedTimeOut": "1000",
       "showEasing": "swing",
       "hideEasing": "linear",

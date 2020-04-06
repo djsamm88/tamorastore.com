@@ -45,7 +45,11 @@
         foreach($all as $x)
         {
           $btn = "<button class='btn btn-warning btn-xs' onclick='edit_admin($x->id_gudang);return false;'>Edit</button>
-                  <button class='btn btn-danger btn-xs' onclick='hapus_admin($x->id_gudang);return false;'>Hapus</button>    ";
+                 <!-- 
+                 <button class='btn btn-danger btn-xs' onclick='hapus_admin($x->id_gudang);return false;'>Hapus</button>
+                 -->
+                 ";
+
           $no++;
 
             echo (" 

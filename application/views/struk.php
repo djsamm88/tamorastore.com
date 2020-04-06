@@ -82,11 +82,15 @@ font-size:10px;
 	}
 	
 	$total_diskon = $tot-$data[0]->diskon;
-	$total = $total_diskon+$data[0]->harga_ekspedisi+$data[0]->transport_ke_ekspedisi;
+	$total = $total_diskon+$data[0]->harga_ekspedisi+$data[0]->transport_ke_ekspedisi-$data[0]->saldo;
 	echo "
 		<tr>
 			<td colspan=5 align=right>Total</td>
 			<td align=right><b>".rupiah($tot)."</b></td>
+		</tr>
+		<tr>
+			<td colspan=5 align=right>Saldo</td>
+			<td align=right><b>".rupiah($data[0]->saldo)."</b></td>
 		</tr>
 		<tr>
 			<td colspan=5 align=right>Diskon</td>

@@ -16,7 +16,6 @@ class Gudang extends CI_Controller {
 		date_default_timezone_set("Asia/jakarta");
 		//$this->load->library('datatables');
 		$this->load->model('m_gudang');
-
 		
 	}
 

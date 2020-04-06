@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Apr 06, 2020 at 02:37 PM
+-- Generation Time: Apr 06, 2020 at 09:12 PM
 -- Server version: 10.1.30-MariaDB
 -- PHP Version: 5.6.33
 
@@ -37,7 +37,7 @@ CREATE TABLE `tbl_admin` (
   `nama_admin` varchar(222) NOT NULL,
   `telp_admin` varchar(222) NOT NULL,
   `email_admin` varchar(222) NOT NULL,
-  `level` enum('3','2','1') NOT NULL COMMENT '1=admin,2=keuangan,3=CS',
+  `level` enum('4','3','2','1') NOT NULL COMMENT '1=admin,2=keuangan,3=CS',
   `request_status` int(1) NOT NULL COMMENT '1=link_sent,0=tidak_ada',
   `tempat_lahir` varchar(222) NOT NULL,
   `tgl_lahir` date NOT NULL,
@@ -54,7 +54,8 @@ CREATE TABLE `tbl_admin` (
 INSERT INTO `tbl_admin` (`id_admin`, `user_admin`, `pass_admin`, `time_admin`, `status_admin`, `nama_admin`, `telp_admin`, `email_admin`, `level`, `request_status`, `tempat_lahir`, `tgl_lahir`, `kelamin`, `pendidikan`, `jabatan`, `npwp`) VALUES
 (1, 'admin', 'e10adc3949ba59abbe56e057f20f883e', '2020-04-03 09:23:18', '1', 'Admin', '0811656616', 'dokterwebid@gmail.com', '1', 0, '', '0000-00-00', 'L', '', '', ''),
 (2, 'kasir', '827ccb0eea8a706c4c34a16891f84e7b', '2020-01-25 08:29:32', '1', 'kasir', '082277109994', 'reza.angga@gmail.com', '3', 0, 'Medan', '0000-00-00', 'L', 'S1', 'Designer', '4223423'),
-(5, 'jony', 'e10adc3949ba59abbe56e057f20f883e', '2018-12-03 05:06:43', '1', 'Jony', '082277109994', 'blionia.com@gmail.com', '2', 0, '', '0000-00-00', 'L', '', '', '');
+(5, 'jony', 'e10adc3949ba59abbe56e057f20f883e', '2018-12-03 05:06:43', '1', 'Jony', '082277109994', 'blionia.com@gmail.com', '2', 0, '', '0000-00-00', 'L', '', '', ''),
+(6, 'reza', 'e10adc3949ba59abbe56e057f20f883e', '2020-04-06 19:10:15', '1', 'Reza', '-', 'djsamm88.web.id@gmail.com', '4', 0, 'Medan', '1988-09-30', 'L', '-', '-', '-');
 
 -- --------------------------------------------------------
 
@@ -306,9 +307,18 @@ INSERT INTO `tbl_barang_masuk_tanpa_harga` (`id_barang_masuk`, `id_barang`, `qty
 (6, 42, 5, 1, '2020-04-05 12:38:51', 'sudah'),
 (7, 42, 10, 1, '2020-04-05 13:04:55', 'sudah'),
 (8, 74, 5, 1, '2020-04-05 13:27:31', 'sudah'),
-(9, 106, 12, 1, '2020-04-06 09:41:02', 'belum'),
+(9, 106, 12, 1, '2020-04-06 15:50:56', 'sudah'),
 (10, 10, 2, 2, '2020-04-06 09:49:24', 'sudah'),
-(11, 42, 10, 1, '2020-04-06 09:46:25', 'belum');
+(11, 42, 10, 1, '2020-04-06 15:50:55', 'sudah'),
+(12, 119, 5, 1, '2020-04-06 15:29:02', 'sudah'),
+(13, 119, 1, 1, '2020-04-06 15:50:37', 'sudah'),
+(14, 119, 3, 1, '2020-04-06 16:06:20', 'sudah'),
+(15, 119, 5, 2, '2020-04-06 16:06:56', 'sudah'),
+(16, 119, 50, 2, '2020-04-06 18:05:43', 'sudah'),
+(17, 42, 100, 1, '2020-04-06 18:05:45', 'sudah'),
+(18, 119, 10, 1, '2020-04-06 18:27:36', 'sudah'),
+(19, 119, 10, 1, '2020-04-06 18:28:11', 'sudah'),
+(20, 119, 12, 2, '2020-04-06 18:29:03', 'sudah');
 
 -- --------------------------------------------------------
 
@@ -329,13 +339,6 @@ CREATE TABLE `tbl_barang_return` (
   `kondisi` enum('rusak','baik') NOT NULL,
   `id_gudang` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Dumping data for table `tbl_barang_return`
---
-
-INSERT INTO `tbl_barang_return` (`id`, `id_barang`, `jumlah`, `uang_kembali`, `nama`, `hp`, `ket`, `tgl_trx`, `id_pelanggan`, `kondisi`, `id_gudang`) VALUES
-(1, 65, 2, 100000, '', 0, 'Coba return', '2020-04-06 12:33:27', 1, 'baik', 1);
 
 -- --------------------------------------------------------
 
@@ -369,28 +372,26 @@ CREATE TABLE `tbl_barang_transaksi` (
   `transport_ke_ekspedisi` double NOT NULL,
   `harga_ekspedisi` double NOT NULL,
   `nama_ekspedisi` varchar(222) NOT NULL,
-  `id_gudang` int(11) NOT NULL
+  `id_gudang` int(11) NOT NULL,
+  `saldo` double NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `tbl_barang_transaksi`
 --
 
-INSERT INTO `tbl_barang_transaksi` (`id_transaksi`, `jumlah`, `jenis`, `id_barang`, `tgl_transaksi`, `harga_beli`, `grup_penjualan`, `id_admin`, `id_pelanggan`, `nama_pembeli`, `hp_pembeli`, `nama_packing`, `satuan_jual`, `harga_jual`, `diskon`, `bayar`, `sub_total_jual`, `qty_jual`, `jum_per_koli`, `tgl_trx_manual`, `keterangan`, `sub_total_beli`, `transport_ke_ekspedisi`, `harga_ekspedisi`, `nama_ekspedisi`, `id_gudang`) VALUES
-(1, 5, 'masuk', 119, '2020-04-05 11:06:46', 50000, '', 0, 0, '', '', '', '', 0, 0, 0, 0, 0, 0, '0000-00-00 00:00:00', '', 0, 0, 0, '', 2),
-(2, 5, 'masuk', 33, '2020-04-05 11:08:08', 52000, '', 0, 0, '', '', '', '', 0, 0, 0, 0, 0, 0, '0000-00-00 00:00:00', '', 0, 0, 0, '', 2),
-(3, 5, 'masuk', 42, '2020-04-05 12:38:51', 20000, '', 0, 0, '', '', '', '', 0, 0, 0, 0, 0, 0, '0000-00-00 00:00:00', '', 0, 0, 0, '', 1),
-(4, 10, 'masuk', 42, '2020-04-05 13:04:55', 20000, '', 0, 0, '', '', '', '', 0, 0, 0, 0, 0, 0, '0000-00-00 00:00:00', '', 0, 0, 0, '', 1),
-(5, 5, 'masuk', 33, '2020-04-05 13:27:27', 52000, '', 0, 0, '', '', '', '', 0, 0, 0, 0, 0, 0, '0000-00-00 00:00:00', '', 0, 0, 0, '', 1),
-(6, 4, 'masuk', 33, '2020-04-05 13:27:30', 52000, '', 0, 0, '', '', '', '', 0, 0, 0, 0, 0, 0, '0000-00-00 00:00:00', '', 0, 0, 0, '', 1),
-(7, 5, 'masuk', 74, '2020-04-05 13:27:31', 30000, '', 0, 0, '', '', '', '', 0, 0, 0, 0, 0, 0, '0000-00-00 00:00:00', '', 0, 0, 0, '', 1),
-(8, 2, 'masuk', 10, '2020-04-06 09:49:24', 100000, '', 0, 0, '', '', '', '', 0, 0, 0, 0, 0, 0, '0000-00-00 00:00:00', '', 0, 0, 0, '', 2),
-(9, 1, 'keluar', 10, '2020-04-06 09:54:43', 100000, '200406165346', 1, 1, 'samuel', '02348243842482', '', 'retail', 135000, 0, 160000, 135000, 1, 20, '2020-04-06 16:53:46', '', 100000, 5000, 15000, 'TIKI', 0),
-(10, 1, 'keluar', 102, '2020-04-06 10:32:13', 80000, '200406173117', 1, 1, 'samuel', '02348243842482', '', 'retail', 90000, 0, 400000, 90000, 1, 20, '2020-04-06 17:31:17', '', 80000, 5000, 12000, 'JNE', 0),
-(11, 2, 'keluar', 52, '2020-04-06 10:32:13', 25000, '200406173117', 1, 1, 'samuel', '02348243842482', '', 'retail', 30000, 0, 400000, 60000, 2, 20, '2020-04-06 17:31:17', '', 50000, 5000, 12000, 'JNE', 0),
-(12, 4, 'keluar', 112, '2020-04-06 10:32:13', 35000, '200406173117', 1, 1, 'samuel', '02348243842482', '', 'retail', 45000, 0, 400000, 180000, 4, 20, '2020-04-06 17:31:17', '', 140000, 5000, 12000, 'JNE', 0),
-(13, 5, 'keluar', 74, '2020-04-06 11:54:23', 30000, '200406185344', 1, 1, 'samuel', '02348243842482', '', 'retail', 46000, 50000, 202000, 230000, 5, 20, '2020-04-06 18:53:44', '', 150000, 10000, 12000, 'JNE', 0),
-(14, 2, 'masuk', 65, '2020-04-06 12:33:27', 0, '', 0, 0, '', '', '', '', 0, 0, 0, 0, 0, 0, '0000-00-00 00:00:00', '', 0, 0, 0, '', 1);
+INSERT INTO `tbl_barang_transaksi` (`id_transaksi`, `jumlah`, `jenis`, `id_barang`, `tgl_transaksi`, `harga_beli`, `grup_penjualan`, `id_admin`, `id_pelanggan`, `nama_pembeli`, `hp_pembeli`, `nama_packing`, `satuan_jual`, `harga_jual`, `diskon`, `bayar`, `sub_total_jual`, `qty_jual`, `jum_per_koli`, `tgl_trx_manual`, `keterangan`, `sub_total_beli`, `transport_ke_ekspedisi`, `harga_ekspedisi`, `nama_ekspedisi`, `id_gudang`, `saldo`) VALUES
+(1, 10, 'masuk', 119, '2020-04-06 18:27:36', 50000, '', 0, 0, '', '', '', '', 0, 0, 0, 0, 0, 0, '0000-00-00 00:00:00', '', 0, 0, 0, '', 1, 0),
+(2, 10, 'masuk', 119, '2020-04-06 18:28:11', 50000, '', 0, 0, '', '', '', '', 0, 0, 0, 0, 0, 0, '0000-00-00 00:00:00', '', 0, 0, 0, '', 1, 0),
+(3, 12, 'masuk', 119, '2020-04-06 18:29:03', 50000, '', 0, 0, '', '', '', '', 0, 0, 0, 0, 0, 0, '0000-00-00 00:00:00', '', 0, 0, 0, '', 2, 0),
+(4, 12, 'masuk', 119, '2020-04-06 18:29:53', 0, '', 0, 0, '', '', '', '', 0, 0, 0, 0, 0, 0, '0000-00-00 00:00:00', '', 0, 0, 0, '', 1, 0),
+(5, 12, 'keluar', 119, '2020-04-06 18:29:53', 0, '', 0, 0, '', '', '', '', 0, 0, 0, 0, 0, 0, '0000-00-00 00:00:00', '', 0, 0, 0, '', 2, 0),
+(6, 1, 'keluar', 119, '2020-04-06 19:00:48', 50000, '200407013549', 1, 1, 'samuel', '02348243842482', '', 'retail', 55000, 0, 100000, 55000, 1, 0, '2020-04-07 01:35:49', '', 50000, 3000, 12000, 'JNE', 1, -10000),
+(7, 2, 'keluar', 119, '2020-04-06 19:00:57', 50000, '200407014349', 1, 1, 'samuel', '02348243842482', '', 'retail', 55000, 0, 150000, 110000, 2, 0, '2020-04-07 01:43:49', '', 100000, 3000, 12000, 'JNE', 1, -10000),
+(8, 1, 'keluar', 119, '2020-04-06 19:01:00', 50000, '200407014615', 1, 1, 'samuel', '02348243842482', '', 'retail', 55000, 0, 100000, 55000, 1, 0, '2020-04-07 01:46:15', '', 50000, 3000, 12000, 'JNE', 1, 10000),
+(9, 1, 'keluar', 119, '2020-04-06 19:01:02', 50000, '200407015418', 1, 1, 'samuel', '02348243842482', '', 'retail', 55000, 5000, 100000, 55000, 1, 0, '2020-04-07 01:54:18', '', 50000, 8000, 12000, 'JNE', 1, -10000),
+(10, 2, 'keluar', 119, '2020-04-06 19:01:04', 50000, '200407015707', 1, 1, 'samuel', '02348243842482', '', 'retail', 55000, 0, 100000, 110000, 2, 0, '2020-04-07 01:57:07', '', 100000, 0, 0, '', 1, 20000),
+(11, 5, 'keluar', 119, '2020-04-06 19:02:56', 50000, '200407020236', 1, 1, 'samuel', '02348243842482', '', 'retail', 55000, 0, 300000, 275000, 5, 0, '2020-04-07 02:02:36', '', 250000, 0, 0, '', 1, 0);
 
 -- --------------------------------------------------------
 
@@ -486,8 +487,8 @@ CREATE TABLE `tbl_pelanggan` (
 --
 
 INSERT INTO `tbl_pelanggan` (`id_pelanggan`, `nama_pembeli`, `email_pembeli`, `hp_pembeli`, `tgl_daftar`, `tgl_trx_terakhir`, `saldo`) VALUES
-(1, 'samuel', 'djsamm88@gmail.com', '02348243842482', '2020-04-03 16:47:46', '2020-04-06 18:54:23', -5000),
-(2, 'Jony', 'djsamm88@gmail.com', '1200000', '2020-04-03 17:02:11', '2020-04-04 01:10:13', 10000),
+(1, 'samuel', 'djsamm88@gmail.com', '02348243842482', '2020-04-03 16:47:46', '2020-04-07 02:02:56', 0),
+(2, 'Jony', 'djsamm88@gmail.com', '1200000', '2020-04-03 17:02:11', '2020-04-07 00:56:17', 0),
 (3, 'Budy', '', '082277109994', '0000-00-00 00:00:00', '2020-04-03 23:56:21', 0);
 
 -- --------------------------------------------------------
@@ -576,35 +577,14 @@ CREATE TABLE `tbl_transaksi` (
 --
 
 INSERT INTO `tbl_transaksi` (`id`, `id_group`, `id_referensi`, `keterangan`, `tgl_update`, `jumlah`, `id_barang`, `harga_beli`, `diskon`, `nama_ekspedisi`, `harga_ekspedisi`, `transport_ke_ekspedisi`, `id_pelanggan`, `url_bukti`) VALUES
-(1, '1', '1', 'Barang masuk id[33] qty=[5], harga[52000]', '2020-04-05 06:39:34', 260000, 33, 0, 0, '', 0, 0, 0, ''),
-(2, '1', '1', 'Barang masuk id[119] qty=[5], harga[50000]', '2020-04-05 11:06:46', 250000, 119, 0, 0, '', 0, 0, 0, ''),
-(3, '1', '2', 'Barang masuk id[33] qty=[5], harga[52000]', '2020-04-05 11:08:08', 260000, 33, 0, 0, '', 0, 0, 0, ''),
-(4, '1', '3', 'Barang masuk id[42] qty=[5], harga[20000]', '2020-04-05 12:38:51', 100000, 42, 0, 0, '', 0, 0, 0, ''),
-(5, '1', '4', 'Barang masuk id[42] qty=[10], harga[20000]', '2020-04-05 13:04:55', 200000, 42, 0, 0, '', 0, 0, 0, ''),
-(6, '1', '5', 'Barang masuk id[33] qty=[5], harga[52000]', '2020-04-05 13:27:27', 260000, 33, 0, 0, '', 0, 0, 0, ''),
-(7, '1', '6', 'Barang masuk id[33] qty=[4], harga[52000]', '2020-04-05 13:27:30', 208000, 33, 0, 0, '', 0, 0, 0, ''),
-(8, '1', '7', 'Barang masuk id[74] qty=[5], harga[30000]', '2020-04-05 13:27:31', 150000, 74, 0, 0, '', 0, 0, 0, ''),
-(9, '1', '8', 'Barang masuk id[10] qty=[2], harga[100000]', '2020-04-06 09:49:24', 200000, 10, 0, 0, '', 0, 0, 0, ''),
-(10, '8', '200406165346', 'Kpd: [samuel] - Kode TRX:[200406165346] \n				Jumlah:[135.000] \n				diskon:[0] \n				harga_ekspedisi:[15000] \n				transport_ke_ekspedisi:[5.000] \n				', '2020-04-06 09:54:43', 135000, 0, 100000, 0, '', 15000, 5000, 1, ''),
-(11, '14', '200406165346', 'Kpd: [samuel] - Kode TRX:[200406165346] \n				Jumlah:[135.000] \n				diskon:[0] \n				harga_ekspedisi:[15000] \n				transport_ke_ekspedisi:[5.000] \n				', '2020-04-06 09:54:43', 5000, 0, 0, 0, '', 0, 0, 0, ''),
-(12, '13', '200406165346', 'Kpd: [samuel] - Kode TRX:[200406165346] \n				Jumlah:[135.000] \n				diskon:[0] \n				harga_ekspedisi:[15000] \n				transport_ke_ekspedisi:[5.000] \n				', '2020-04-06 09:54:43', 5000, 0, 0, 0, '', 0, 0, 0, ''),
-(13, '16', '200406165346', 'Kpd: [samuel] - Kode TRX:[200406165346] \n				Jumlah:[135.000] \n				diskon:[0] \n				harga_ekspedisi:[15000] \n				transport_ke_ekspedisi:[5.000] \n				', '2020-04-06 09:54:43', 5000, 0, 0, 0, '', 0, 0, 0, ''),
-(14, '15', '200406165346', 'Kpd: [samuel] - Kode TRX:[200406165346] \n				Jumlah:[135.000] \n				diskon:[0] \n				harga_ekspedisi:[15000] \n				transport_ke_ekspedisi:[5.000] \n				', '2020-04-06 09:54:43', 5000, 0, 0, 0, '', 0, 0, 0, ''),
-(15, '8', '200406173117', 'Kpd: [samuel] - Kode TRX:[200406173117] \n				Jumlah:[330.000] \n				diskon:[0] \n				harga_ekspedisi:[12000] \n				transport_ke_ekspedisi:[5.000] \n				', '2020-04-06 10:32:13', 330000, 0, 270000, 0, '', 12000, 5000, 1, ''),
-(16, '14', '200406173117', 'Kpd: [samuel] - Kode TRX:[200406173117] \n				Jumlah:[330.000] \n				diskon:[0] \n				harga_ekspedisi:[12000] \n				transport_ke_ekspedisi:[5.000] \n				', '2020-04-06 10:32:13', 5000, 0, 0, 0, '', 0, 0, 0, ''),
-(17, '13', '200406173117', 'Kpd: [samuel] - Kode TRX:[200406173117] \n				Jumlah:[330.000] \n				diskon:[0] \n				harga_ekspedisi:[12000] \n				transport_ke_ekspedisi:[5.000] \n				', '2020-04-06 10:32:13', 5000, 0, 0, 0, '', 0, 0, 0, ''),
-(18, '16', '200406173117', 'Kpd: [samuel] - Kode TRX:[200406173117] \n				Jumlah:[330.000] \n				diskon:[0] \n				harga_ekspedisi:[12000] \n				transport_ke_ekspedisi:[5.000] \n				', '2020-04-06 10:32:13', 5000, 0, 0, 0, '', 0, 0, 0, ''),
-(19, '15', '200406173117', 'Kpd: [samuel] - Kode TRX:[200406173117] \n				Jumlah:[330.000] \n				diskon:[0] \n				harga_ekspedisi:[12000] \n				transport_ke_ekspedisi:[5.000] \n				', '2020-04-06 10:32:13', 5000, 0, 0, 0, '', 0, 0, 0, ''),
-(27, '17', '', 'coba tambah utang - A.n : samuel - ID :1', '2020-04-06 11:31:30', 10000, 0, 0, 0, '', 0, 0, 1, '1586172690.jpeg'),
-(29, '18', '', 'ini misalnya coba tambah saldo - A.n : Jony - ID :2', '2020-04-06 11:32:51', 10000, 0, 0, 0, '', 0, 0, 2, '1586172771.png'),
-(30, '18', '', 'Coba utang lagi - A.n : samuel - ID :1', '2020-04-06 11:34:32', 5000, 0, 0, 0, '', 0, 0, 1, '1586172872.png'),
-(31, '8', '200406185344', 'Kpd: [samuel] - Kode TRX:[200406185344] \n				Jumlah:[230.000] \n				diskon:[50.000] \n				harga_ekspedisi:[12000] \n				transport_ke_ekspedisi:[10.000] \n				', '2020-04-06 11:54:23', 230000, 0, 150000, 50000, '', 12000, 10000, 1, ''),
-(32, '9', '200406185344', 'Kpd: [samuel] - Kode TRX:[200406185344] \n				Jumlah:[230.000] \n				diskon:[50.000] \n				harga_ekspedisi:[12000] \n				transport_ke_ekspedisi:[10.000] \n				', '2020-04-06 11:54:23', 50000, 0, 0, 0, '', 0, 0, 0, ''),
-(33, '14', '200406185344', 'Kpd: [samuel] - Kode TRX:[200406185344] \n				Jumlah:[230.000] \n				diskon:[50.000] \n				harga_ekspedisi:[12000] \n				transport_ke_ekspedisi:[10.000] \n				', '2020-04-06 11:54:23', 10000, 0, 0, 0, '', 0, 0, 0, ''),
-(34, '13', '200406185344', 'Kpd: [samuel] - Kode TRX:[200406185344] \n				Jumlah:[230.000] \n				diskon:[50.000] \n				harga_ekspedisi:[12000] \n				transport_ke_ekspedisi:[10.000] \n				', '2020-04-06 11:54:23', 10000, 0, 0, 0, '', 0, 0, 0, ''),
-(35, '16', '200406185344', 'Kpd: [samuel] - Kode TRX:[200406185344] \n				Jumlah:[230.000] \n				diskon:[50.000] \n				harga_ekspedisi:[12000] \n				transport_ke_ekspedisi:[10.000] \n				', '2020-04-06 11:54:23', 10000, 0, 0, 0, '', 0, 0, 0, ''),
-(36, '15', '200406185344', 'Kpd: [samuel] - Kode TRX:[200406185344] \n				Jumlah:[230.000] \n				diskon:[50.000] \n				harga_ekspedisi:[12000] \n				transport_ke_ekspedisi:[10.000] \n				', '2020-04-06 11:54:23', 10000, 0, 0, 0, '', 0, 0, 0, ''),
-(37, '6', '65', 'Kpd: [id_pelanggan:1] nama barang: [PEMERAS JERUK] id_barang:[65] Jumlah:[2]  -Coba return', '2020-04-06 12:33:27', 100000, 0, 0, 0, '', 0, 0, 0, '');
+(1, '17', '', 'kurang ongkir - A.n : samuel - ID :1', '2020-04-06 18:54:14', 10000, 0, 0, 0, '', 0, 0, 1, ''),
+(2, '8', '200407015418', 'Kpd: [samuel] - Kode TRX:[200407015418] \n        Jumlah:[55.000] \n        diskon:[5.000] \n       harga_ekspedisi:[12000] \n        transport_ke_ekspedisi:[8.000] \n       ', '2020-04-06 18:55:09', 55000, 0, 50000, 5000, '', 12000, 8000, 1, ''),
+(3, '9', '200407015418', 'Kpd: [samuel] - Kode TRX:[200407015418] \n        Jumlah:[55.000] \n        diskon:[5.000] \n       harga_ekspedisi:[12000] \n        transport_ke_ekspedisi:[8.000] \n       ', '2020-04-06 18:55:09', 5000, 0, 0, 0, '', 0, 0, 0, ''),
+(4, '18', '200407015418', 'Saldo potong langsung saat belanja dengan ID TRX:200407015418 - A.n : samuel - ID :1', '2020-04-06 18:55:09', 10000, 0, 0, 0, '', 0, 0, 1, ''),
+(5, '18', '', 'ada lebih ongkir - A.n : samuel - ID :1', '2020-04-06 18:57:04', 20000, 0, 0, 0, '', 0, 0, 1, ''),
+(6, '8', '200407015707', 'Kpd: [samuel] - Kode TRX:[200407015707] \n        Jumlah:[110.000] \n       diskon:[0] \n       harga_ekspedisi:[0] \n        transport_ke_ekspedisi:[0] \n       ', '2020-04-06 18:57:39', 110000, 0, 100000, 0, '', 0, 0, 1, ''),
+(7, '17', '200407015707', 'Saldo potong langsung saat belanja dengan ID TRX:200407015707 - A.n : samuel - ID :1', '2020-04-06 18:57:39', 20000, 0, 0, 0, '', 0, 0, 1, ''),
+(8, '8', '200407020236', 'Kpd: [samuel] - Kode TRX:[200407020236] \n        Jumlah:[275.000] \n       diskon:[0] \n       harga_ekspedisi:[0] \n        transport_ke_ekspedisi:[0] \n       ', '2020-04-06 19:02:56', 275000, 0, 250000, 0, '', 0, 0, 1, '');
 
 --
 -- Indexes for dumped tables
@@ -696,7 +676,7 @@ ALTER TABLE `tbl_transaksi`
 -- AUTO_INCREMENT for table `tbl_admin`
 --
 ALTER TABLE `tbl_admin`
-  MODIFY `id_admin` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id_admin` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `tbl_barang`
@@ -708,19 +688,19 @@ ALTER TABLE `tbl_barang`
 -- AUTO_INCREMENT for table `tbl_barang_masuk_tanpa_harga`
 --
 ALTER TABLE `tbl_barang_masuk_tanpa_harga`
-  MODIFY `id_barang_masuk` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id_barang_masuk` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `tbl_barang_return`
 --
 ALTER TABLE `tbl_barang_return`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `tbl_barang_transaksi`
 --
 ALTER TABLE `tbl_barang_transaksi`
-  MODIFY `id_transaksi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id_transaksi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `tbl_ekspedisi`
@@ -768,7 +748,7 @@ ALTER TABLE `tbl_pengeluaran_transaksi`
 -- AUTO_INCREMENT for table `tbl_transaksi`
 --
 ALTER TABLE `tbl_transaksi`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

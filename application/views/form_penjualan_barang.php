@@ -78,6 +78,16 @@
         
       </tbody>
       <tfoot>
+
+        <tr>
+          <td colspan="6" align="right"><b>Saldo</b></td>
+          <td  align="right" >
+            <input id="t4_saldo" type="text" name="saldo" class="form-control nomor" value="0" style="text-align:right;" readonly>
+          </td>
+          <td></td>
+        </tr>
+
+
         <tr>
           <td colspan="6" align="right"><b>Diskon</b></td>
           <td  align="right" >
@@ -85,6 +95,7 @@
           </td>
           <td></td>
         </tr>
+
 
         <td colspan="6" align="right"><b>Biaya ke ekspedisi</b></td>
           <td  align="right" >
@@ -174,11 +185,16 @@ $('.datepicker').datepicker({
   autoclose: true,
   format: 'yyyy-mm-dd <?php echo date('H:i:s')?>' 
 })
-
+notif(); 
 <?php 
   $p = '';
   foreach ($pelanggan as $pp) {
-    $p.='{value:"'.$pp->id_pelanggan.'",label:"'.htmlentities($pp->nama_pembeli).'",hp_pembeli:"'.htmlentities($pp->hp_pembeli).'"},';
+    $p.='{
+            value:"'.$pp->id_pelanggan.'",
+            label:"'.htmlentities($pp->nama_pembeli).'",
+            hp_pembeli:"'.htmlentities($pp->hp_pembeli).'",
+            saldo:"'.htmlentities($pp->saldo).'",
+          },';
   }
 ?>
 $(function(){
@@ -190,6 +206,7 @@ $(function(){
         console.log(ui.item.value);
         $("#id_pelanggan").val(ui.item.value);
         $("#hp_pembeli").val(ui.item.hp_pembeli);
+        $("#t4_saldo").val(ui.item.saldo);
         $(this).val(ui.item.label);
         return false;
       }
@@ -218,7 +235,15 @@ $("#nama_ekspedisi").on("change",function(){
 $o=''; 
 foreach($all as $barang)
 {
- $o.='{value:"'.$barang->id.'",label:"'.htmlentities($barang->nama_barang).'",stok:"'.htmlentities($barang->qty).'",harga_retail:"'.htmlentities($barang->harga_retail).'",harga_lusin:"'.htmlentities($barang->harga_lusin).'",harga_koli:"'.htmlentities($barang->harga_koli).'",jum_per_koli:"'.htmlentities($barang->jum_per_koli).'"},';
+ $o.='{
+        value:"'.$barang->id.'",
+        label:"'.htmlentities($barang->nama_barang).'",
+        stok:"'.htmlentities($barang->qty).'",
+        harga_retail:"'.htmlentities($barang->harga_retail).'",
+        harga_lusin:"'.htmlentities($barang->harga_lusin).'",
+        harga_koli:"'.htmlentities($barang->harga_koli).'",
+        jum_per_koli:"'.htmlentities($barang->jum_per_koli).'"
+      },';
 } 
 ?>
 
@@ -323,7 +348,7 @@ $("#tbl_datanya").on("keydown keyup mousedown mouseup select contextmenu drop","
 
 
 
-$("#t4_diskon,#nama_ekspedisi,#t4_transport_ke_ekspedisi,#t4_ekspedisi").on("keydown keyup mousedown mouseup select contextmenu drop",function(){
+$("#t4_diskon,#nama_ekspedisi,#t4_transport_ke_ekspedisi,#t4_ekspedisi,.barang,#nama_pembeli").on("keydown keyup mousedown mouseup select contextmenu drop",function(){
     total();
 })
 
@@ -364,12 +389,14 @@ function total()
   })
   console.log(total);
 
+  var saldo  = parseInt(buang_titik($("#t4_saldo").val()));
   var diskon = parseInt(buang_titik($("#t4_diskon").val()));
   var harga_ekspedisi = parseInt(buang_titik($("#t4_ekspedisi").val()));
   var transport_ke_ekspedisi = parseInt(buang_titik($("#t4_transport_ke_ekspedisi").val()));
   total+=transport_ke_ekspedisi;
   total+=harga_ekspedisi;
   total-=diskon;
+  total-=saldo;
   $("#t4_total").html(formatRupiah(total));
 }
 
@@ -386,7 +413,7 @@ $("#penjualan_barang").on("submit",function(){
 
         console.log("<?php echo base_url()?>index.php/barang/struk_penjualan/"+x);
 
-      
+        notif();   
     })
   
   }

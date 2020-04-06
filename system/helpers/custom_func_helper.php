@@ -37,6 +37,7 @@ function level($int)
 			'1' => "Admin", 
 			'2' => "Keuangan", 
 			'3' => "Kasir", 
+			'4' => "Gudang", 
 			);
 	return $a[$int];
 }
@@ -45,13 +46,9 @@ if ( ! function_exists('hanya_nomor'))
 {
 	function hanya_nomor($string) 
 	{
-		if (preg_match('/[0-9]+/', $string))
-		{
-			return preg_replace('/\D/', '', $string);
-		}else{
-			return (int)0;
-		}
-		
+		$string = str_replace(" ", "", $string);
+		$string = str_replace(".", "", $string);
+		return $string;
 	}
 }
 
