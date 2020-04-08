@@ -38,7 +38,7 @@
                   Jumlah
                 </div>                
                 <div class="col-sm-2" >
-                  <input type="number" name="jumlah" class="form-control" placeholder="jumlah barang">
+                  <input type="number" name="jumlah" value="1" id="jumlah_barang" class="form-control" placeholder="jumlah barang">
                 </div>
                 <div style="clear: both;"></div><br>
 
@@ -76,7 +76,7 @@
                   Total Uang Kembali
                 </div>
                 <div class="col-sm-8" >
-                  <input type="text" name="uang_kembali" class="form-control nomor" placeholder="Uang kembali">
+                  <input type="text" name="uang_kembali" id="uang_kembali" class="form-control nomor" placeholder="Uang kembali">
                 </div>
                 <div style="clear: both;"></div><br>
 
@@ -161,6 +161,8 @@
               <th>Total Uang kembali</th>                     
               <th>Dari</th>                     
               <th>No HP</th>                     
+              <th>Kondisi</th>                     
+              <th>Gudang</th>                     
               <th>Keterangan</th>                     
               <th>Tgl</th>                     
                                   
@@ -185,6 +187,8 @@
                 <td>".rupiah($x->uang_kembali)."</td>                
                 <td>$x->nama_pembeli</td>                
                 <td>$x->hp_pembeli</td>                
+                <td>$x->kondisi</td>                
+                <td>$x->nama_gudang</td>                
                 <td>$x->ket</td>                
                 <td>$x->tgl_trx</td>                
                 
@@ -198,12 +202,14 @@
       </tbody>
   </table>
 
+<a href="<?php echo base_url()?>index.php/barang/print_return_barang/" class="btn btn-primary" target="blank">Print Semua</a>
+<a href="<?php echo base_url()?>index.php/barang/print_return_barang/rusak" class="btn btn-danger" target="blank">Print Rusak</a>
+<a href="<?php echo base_url()?>index.php/barang/print_return_barang/baik" class="btn btn-success" target="blank">Print Baik</a>
 
-        </div>
-        
-      </div>
-      <!-- /.box -->
 
+</div>
+</div>
+<!-- /.box -->
 </section>
     <!-- /.content -->
 
@@ -218,7 +224,15 @@ var classnya = "<?php echo $this->router->fetch_class();?>";
 $o=''; 
 foreach($all_barang as $barang)
 {
- $o.='{value:"'.$barang->id.'",label:"'.htmlentities($barang->nama_barang).'",stok:"'.htmlentities($barang->qty).'",harga_retail:"'.htmlentities($barang->harga_retail).'",harga_lusin:"'.htmlentities($barang->harga_lusin).'",harga_koli:"'.htmlentities($barang->harga_koli).'",jum_per_koli:"'.htmlentities($barang->jum_per_koli).'"},';
+ $o.='{
+        value:"'.$barang->id.'",
+        label:"'.htmlentities($barang->nama_barang).'",
+        stok:"'.htmlentities($barang->qty).'",
+        harga_retail:"'.htmlentities($barang->harga_retail).'",
+        harga_lusin:"'.htmlentities($barang->harga_lusin).'",
+        harga_koli:"'.htmlentities($barang->harga_koli).'",
+        jum_per_koli:"'.htmlentities($barang->jum_per_koli).'"
+      },';
 } 
 ?>
 
@@ -237,6 +251,7 @@ $( function() {
 
                 $(this).val(ui.item.label);
                 $("#id_barang").val(ui.item.value);
+                $("#uang_kembali").val(ui.item.harga_retail);
                 return false;
                 }
 
@@ -248,6 +263,18 @@ $( function() {
 });
 
 
+
+$("#jumlah_barang").on("keydown keyup mousedown mouseup select contextmenu drop",function(){
+    var jum   = parseInt(buang_titik($(this).val()));
+    var uang  = parseInt(buang_titik($("#uang_kembali").val()));
+
+    console.log(jum);
+    console.log(uang);
+    var hasil_kali = jum*uang;
+
+    console.log(hasil_kali);
+    //$("#uang_kembali").val(hasil_kali);
+})
 
 $("#form_return").on("submit",function(){
   console.log($(this).serialize());

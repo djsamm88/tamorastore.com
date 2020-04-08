@@ -33,8 +33,7 @@
               
               <th>No</th>
                <th width="100px">id_gudang</th>
-                <th>nama_gudang</th>
-                <th>reminder</th>                
+                <th>nama_gudang</th>                
               <th>Action</th>
               
         </tr>
@@ -57,8 +56,7 @@
               <tr>
                 <td>$no</td>
                 <td>$x->id_gudang</td>
-                <td>$x->nama_gudang</td>
-                <td>".rupiah($x->reminder)."</td>                
+                <td>$x->nama_gudang</td>                          
                 <td>
                   $btn
                 </td>
@@ -104,16 +102,6 @@
             </div>
             <div style="clear:both"></div>
             <br>
-
-
-            <div class="col-sm-4 judul">reminder</div>
-            <div class="col-sm-8">
-              <input class="form-control nomor" name="reminder" id="reminder" required>
-            </div>
-            <div style="clear:both"></div>
-            <br>
-
-
 
             <div id="t4_info_form"></div>
             <button type="submit" class="btn btn-primary"> Simpan </button>
@@ -161,8 +149,7 @@ function edit_admin(id_gudang)
   $.get("<?php echo base_url()?>index.php/gudang/by_id/"+id_gudang,function(e){
     //console.log(e[0].id_desa);
     $("#id_gudang").val(e[0].id_gudang);
-    $("#nama_gudang").val(e[0].nama_gudang);
-    $("#reminder").val(e[0].reminder);
+    $("#nama_gudang").val(e[0].nama_gudang);    
     
   })
   $("#myModal").modal('show');

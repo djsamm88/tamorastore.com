@@ -41,6 +41,7 @@
               <th>Harga Lusin</th>                     
               <th>Harga Koli</th>                     
               <th>Jumlah / Koli</th>                     
+              <th>Reminder Gudang</th>                     
               <th>Action</th>                     
               
               
@@ -66,7 +67,8 @@
                 <td>".rupiah($x->harga_retail)."</td>                
                 <td>".rupiah($x->harga_lusin)."</td>                
                 <td>".rupiah($x->harga_koli)."</td>                
-                <td>".rupiah($x->jum_per_koli)."</td>                
+                <td>".rupiah($x->jum_per_koli)."</td>     
+                <td>$x->reminder</td>                           
                 <td>
                   $btn
                 </td>
@@ -135,6 +137,12 @@
             <div style="clear: both;"></div><br>
         
 
+
+        <div class="col-sm-4">Reminder Gudang</div>
+            <div class="col-sm-8"><input type="text" name="reminder" id="reminder" required="required" class="form-control nomor" placeholder="reminder gudang" ></div>
+            <div style="clear: both;"></div><br>
+        
+
             <div id="t4_info_form"></div>
             <button type="submit" class="btn btn-primary"> Simpan </button>
           </form>
@@ -167,6 +175,7 @@ function edit(id)
     $("#harga_koli").val(e[0].harga_koli);
     $("#jum_per_koli").val(e[0].jum_per_koli);
     $("#harga_pokok").val(e[0].harga_pokok);
+    $("#reminder").val(e[0].reminder);
     console.log(e[0].qty);
     if(e[0].qty!="0")
     {      

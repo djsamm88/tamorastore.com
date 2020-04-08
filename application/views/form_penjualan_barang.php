@@ -242,7 +242,8 @@ foreach($all as $barang)
         harga_retail:"'.htmlentities($barang->harga_retail).'",
         harga_lusin:"'.htmlentities($barang->harga_lusin).'",
         harga_koli:"'.htmlentities($barang->harga_koli).'",
-        jum_per_koli:"'.htmlentities($barang->jum_per_koli).'"
+        jum_per_koli:"'.htmlentities($barang->jum_per_koli).'",
+        reminder:"'.htmlentities($barang->reminder).'"
       },';
 } 
 ?>
@@ -258,12 +259,24 @@ $( function() {
                   console.log(ui);
                   $(this).val('');
 
+       if(ui.item.stok=="0")
+       {
+        alert("Stok gudang KOSONG. Item : "+ui.item.label);
+        return false;
+       }
+
+       if(ui.item.stok<ui.item.reminder)
+       {
+        notif();//notif ini dari footer welcome
+       }
+
+       
                   
-                  var pilih_satuan = "<select name='satuan_jual["+ui.item.value+"]' class='form-control' id='pilihSatuan' onchange='gantiHarga("+ui.item.harga_retail+","+ui.item.harga_lusin+","+ui.item.harga_koli+","+ui.item.jum_per_koli+",$(this))'>"+
-                                        "<option value='retail'>Retail</option>"+
-                                        "<option value='lusin'>Lusin</option>"+
-                                        "<option value='koli'>Koli</option>"+
-                                     "</select>";
+       var pilih_satuan = "<select name='satuan_jual["+ui.item.value+"]' class='form-control' id='pilihSatuan' onchange='gantiHarga("+ui.item.harga_retail+","+ui.item.harga_lusin+","+ui.item.harga_koli+","+ui.item.jum_per_koli+",$(this))'>"+
+                            "<option value='retail'>Retail</option>"+
+                            "<option value='lusin'>Lusin</option>"+
+                            "<option value='koli'>Koli</option>"+
+                         "</select>";
 
 
         var template = "<tr>"+

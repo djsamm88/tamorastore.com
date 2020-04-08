@@ -86,7 +86,7 @@ if (!defined('BASEPATH'))exit('No direct script access allowed');
 
 	public function m_data_gudang($id_gudang)
 	{
-		$q = $this->db->query("SELECT a.*,IFNULL(b.qty,0) AS qty,b.id_gudang,c.nama_gudang,c.reminder
+		$q = $this->db->query("SELECT a.*,IFNULL(b.qty,0) AS qty,b.id_gudang,c.nama_gudang,a.reminder
 								FROM tbl_barang a
 								INNER JOIN(
 										SELECT 
@@ -111,7 +111,7 @@ if (!defined('BASEPATH'))exit('No direct script access allowed');
 
 	public function m_stok_gudang_by_id($id_barang,$id_gudang)
 	{
-		$q = $this->db->query("SELECT a.*,IFNULL(b.qty,0) AS qty,b.id_gudang,c.nama_gudang,c.reminder
+		$q = $this->db->query("SELECT a.*,IFNULL(b.qty,0) AS qty,b.id_gudang,c.nama_gudang,a.reminder
 								FROM tbl_barang a
 								INNER JOIN(
 										SELECT 
@@ -144,7 +144,7 @@ if (!defined('BASEPATH'))exit('No direct script access allowed');
 
 		$q = $this->db->query("
 							
-								SELECT a.*,IFNULL(b.qty,0) AS qty,b.id_gudang,c.nama_gudang,c.reminder
+								SELECT a.*,IFNULL(b.qty,0) AS qty,b.id_gudang,c.nama_gudang,a.reminder
 								FROM tbl_barang a
 								INNER JOIN(
 										SELECT 
@@ -161,7 +161,7 @@ if (!defined('BASEPATH'))exit('No direct script access allowed');
 								ON a.id =b.id_barang	
 								LEFT JOIN tbl_gudang c ON b.id_gudang=c.id_gudang								
 								
-								WHERE c.reminder > b.qty $if
+								WHERE a.reminder > b.qty $if
 
 							
 					");
@@ -206,12 +206,21 @@ if (!defined('BASEPATH'))exit('No direct script access allowed');
 		return $q->num_rows();
 	}
 
-	public function m_return_barang()
+	public function m_return_barang($kondisi=null)
 	{
-		$q = $this->db->query("SELECT a.*,b.*,c.* 
+		if($kondisi==null)
+		{
+			$where = "";
+		}else{
+			$where = "WHERE a.kondisi='$kondisi'";
+		}
+
+		$q = $this->db->query("SELECT a.*,b.*,c.*,d.nama_gudang
 								FROM tbl_barang_return a
 								LEFT JOIN tbl_barang b ON a.id_barang=b.id
 								LEFT JOIN tbl_pelanggan c ON a.id_pelanggan=c.id_pelanggan
+								LEFT JOIN tbl_gudang d ON a.id_gudang=d.id_gudang
+								$where
 								ORDER BY a.id DESC
 					");
 		return $q->result();

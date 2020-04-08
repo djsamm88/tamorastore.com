@@ -247,7 +247,7 @@ $("#form_pindah").on("submit",function(){
     console.log(x);
     
       $("#t4_info_form").html("<div class='alert alert-success'>Berhasil.</div>").fadeIn().delay(3000).fadeOut();
-
+      notif();
       setTimeout(function(){
         $("#myModal").modal('hide');
       },3000);
