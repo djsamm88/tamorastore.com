@@ -3,7 +3,7 @@
     <section class="content-header">
       <h1 id="judul">
         Selamat datang di Sistem Informasi 
-        <small>UMROH</small>
+        <small></small>
       </h1>      
     </section>
 

@@ -9,11 +9,26 @@ class M_pelanggan extends CI_Model {
 		$this->load->helper('custom_func');
 	}
 
+
+
+	public function cek_email_user($email)
+	{
+		$query = $this->db->query("SELECT * FROM tbl_pelanggan WHERE email_pembeli='$email'");
+		return $query->num_rows();
+	}
+
 	public function m_data()
 	{
 		$q = $this->db->query("SELECT a.* FROM tbl_pelanggan a ");
 		return $q->result();
 	}
+
+	public function m_data_autocomplete($cari)
+	{
+		$q = $this->db->query("SELECT a.* FROM tbl_pelanggan a WHERE nama_pembeli LIKE '%$cari%'");
+		return $q->result();
+	}
+	
 
 	public function m_by_id($id_pelanggan)
 	{

@@ -109,6 +109,86 @@ if (!defined('BASEPATH'))exit('No direct script access allowed');
 	}
 
 
+
+	public function m_data_gudang_pelanggan()
+	{
+		$q = $this->db->query("SELECT a.*,IFNULL(b.qty,0) AS qty,b.id_gudang,c.nama_gudang,a.reminder
+								FROM tbl_barang a
+								INNER JOIN(
+										SELECT 
+											a.id_barang,a.id_gudang, 
+											IFNULL(a.qty,0)-IFNULL(b.qty,0) AS qty
+											 FROM 
+											(SELECT id_barang,SUM(jumlah) AS qty,id_gudang FROM `tbl_barang_transaksi` WHERE jenis='masuk' GROUP BY id_barang,id_gudang
+											)a 
+											LEFT JOIN 
+											(SELECT id_barang,SUM(jumlah) AS qty,id_gudang FROM `tbl_barang_transaksi` WHERE jenis='keluar' GROUP BY id_barang,id_gudang
+											)b 
+											ON a.id_barang=b.id_barang AND a.id_gudang=b.id_gudang
+								)b
+								ON a.id =b.id_barang	
+								LEFT JOIN tbl_gudang c ON b.id_gudang=c.id_gudang
+								WHERE IFNULL(b.qty,0) > 0
+								ORDER BY b.qty ASC
+					");
+		return $q;
+	}
+
+
+
+
+	public function m_data_gudang_autocomplete($id_gudang,$cari)
+	{
+		$q = $this->db->query("SELECT a.*,IFNULL(b.qty,0) AS qty,b.id_gudang,c.nama_gudang,a.reminder
+								FROM tbl_barang a
+								INNER JOIN(
+										SELECT 
+											a.id_barang,a.id_gudang, 
+											IFNULL(a.qty,0)-IFNULL(b.qty,0) AS qty
+											 FROM 
+											(SELECT id_barang,SUM(jumlah) AS qty,id_gudang FROM `tbl_barang_transaksi` WHERE jenis='masuk' GROUP BY id_barang,id_gudang
+											)a 
+											LEFT JOIN 
+											(SELECT id_barang,SUM(jumlah) AS qty,id_gudang FROM `tbl_barang_transaksi` WHERE jenis='keluar' GROUP BY id_barang,id_gudang
+											)b 
+											ON a.id_barang=b.id_barang AND a.id_gudang=b.id_gudang
+								)b
+								ON a.id =b.id_barang	
+								LEFT JOIN tbl_gudang c ON b.id_gudang=c.id_gudang
+								WHERE b.id_gudang='$id_gudang' AND a.nama_barang LIKE '%$cari%' AND qty>0
+								ORDER BY b.qty ASC
+					");
+		return $q;
+	}
+
+
+	public function m_stok_by_id_barang($id_gudang,$id_barang)
+	{
+		$q = $this->db->query("SELECT a.*,IFNULL(b.qty,0) AS qty,b.id_gudang,c.nama_gudang,a.reminder
+								FROM tbl_barang a
+								INNER JOIN(
+										SELECT 
+											a.id_barang,a.id_gudang, 
+											IFNULL(a.qty,0)-IFNULL(b.qty,0) AS qty
+											 FROM 
+											(SELECT id_barang,SUM(jumlah) AS qty,id_gudang FROM `tbl_barang_transaksi` WHERE jenis='masuk' GROUP BY id_barang,id_gudang
+											)a 
+											LEFT JOIN 
+											(SELECT id_barang,SUM(jumlah) AS qty,id_gudang FROM `tbl_barang_transaksi` WHERE jenis='keluar' GROUP BY id_barang,id_gudang
+											)b 
+											ON a.id_barang=b.id_barang AND a.id_gudang=b.id_gudang
+								)b
+								ON a.id =b.id_barang	
+								LEFT JOIN tbl_gudang c ON b.id_gudang=c.id_gudang
+								WHERE b.id_gudang='$id_gudang' AND a.id='$id_barang'
+								ORDER BY b.qty ASC
+					");
+		return $q;
+	}
+
+	
+
+
 	public function m_stok_gudang_by_id($id_barang,$id_gudang)
 	{
 		$q = $this->db->query("SELECT a.*,IFNULL(b.qty,0) AS qty,b.id_gudang,c.nama_gudang,a.reminder
@@ -212,15 +292,30 @@ if (!defined('BASEPATH'))exit('No direct script access allowed');
 		{
 			$where = "";
 		}else{
-			$where = "WHERE a.kondisi='$kondisi'";
+			$where = " AND a.kondisi='$kondisi'";
 		}
+
+		$q = $this->db->query("SELECT a.*,a.id AS id_ret ,b.*,c.*,d.nama_gudang
+								FROM tbl_barang_return a
+								LEFT JOIN tbl_barang b ON a.id_barang=b.id
+								LEFT JOIN tbl_pelanggan c ON a.id_pelanggan=c.id_pelanggan
+								LEFT JOIN tbl_gudang d ON a.id_gudang=d.id_gudang
+								WHERE a.status='toko' $where
+								ORDER BY a.id DESC
+					");
+		return $q->result();
+	}
+
+
+	public function m_return_ke_suplier()
+	{
 
 		$q = $this->db->query("SELECT a.*,b.*,c.*,d.nama_gudang
 								FROM tbl_barang_return a
 								LEFT JOIN tbl_barang b ON a.id_barang=b.id
 								LEFT JOIN tbl_pelanggan c ON a.id_pelanggan=c.id_pelanggan
 								LEFT JOIN tbl_gudang d ON a.id_gudang=d.id_gudang
-								$where
+								WHERE status='toko' 
 								ORDER BY a.id DESC
 					");
 		return $q->result();
@@ -274,13 +369,16 @@ if (!defined('BASEPATH'))exit('No direct script access allowed');
 		$q = "
 				SELECT 
 					a.*,
-					b.nama_barang,
-					c.nama_admin
+					b.*,
+					c.nama_admin,
+					d.saldo
 				FROM tbl_barang_transaksi a 
 				LEFT JOIN tbl_barang b 
 				ON a.id_barang=b.id 
 				LEFT JOIN tbl_admin c 
 				ON a.id_admin=c.id_admin
+				LEFT JOIN tbl_pelanggan d 
+				ON a.id_pelanggan=d.id_pelanggan
 				WHERE a.grup_penjualan='$grup_penjualan'
 			";
 
@@ -288,17 +386,195 @@ if (!defined('BASEPATH'))exit('No direct script access allowed');
 		return $get->result();
 	}
 
-	public function m_lap_penjualan()
-	{
-		$q = $this->db->query("SELECT grup_penjualan,SUM(sub_total_jual) AS total, diskon,tgl_transaksi,nama_pembeli,hp_pembeli,nama_packing,tgl_transaksi,tgl_trx_manual,
-			harga_ekspedisi,transport_ke_ekspedisi,id_pelanggan 
-			FROM `tbl_barang_transaksi` 
-			WHERE jenis='keluar' AND (harga_beli <> 0 AND harga_jual <> 0)
+	public function m_lap_penjualan($id_admin='')
+	{	
+		$where="";
+		if($id_admin!='')
+		{
+			$where=" AND a.id_admin='$id_admin'";
+		}
+
+
+		$q = $this->db->query("
+				SELECT 
+				a.grup_penjualan,
+				SUM(a.sub_total_jual) AS total, 
+				a.diskon,
+				a.tgl_transaksi,
+				a.nama_pembeli,
+				a.hp_pembeli,
+				a.nama_packing,
+				a.tgl_transaksi,
+				a.tgl_trx_manual,
+				a.harga_ekspedisi,
+				a.transport_ke_ekspedisi,
+				a.id_pelanggan,
+				b.nama_admin,
+				b.email_admin 
+			FROM tbl_barang_transaksi a
+			LEFT JOIN tbl_admin b ON a.id_admin=b.id_admin
+			WHERE a.jenis='keluar' AND (a.harga_beli <> 0 AND a.harga_jual <> 0) $where
 			GROUP BY grup_penjualan
 			ORDER BY tgl_transaksi DESC
 			");
 		return $q->result();
 	}
+
+
+	public function m_lap_penjualan_member($id_pelanggan)
+	{	
+		
+		$where=" AND a.id_pelanggan='$id_pelanggan'";
+		
+		$q = $this->db->query("
+				SELECT 
+				a.grup_penjualan,
+				SUM(a.sub_total_jual) AS total, 
+				a.diskon,
+				a.tgl_transaksi,
+				a.nama_pembeli,
+				a.hp_pembeli,
+				a.nama_packing,
+				a.tgl_transaksi,
+				a.tgl_trx_manual,
+				a.harga_ekspedisi,
+				a.transport_ke_ekspedisi,
+				a.id_pelanggan,
+				b.nama_admin,
+				b.email_admin 
+			FROM tbl_barang_transaksi a
+			LEFT JOIN tbl_admin b ON a.id_admin=b.id_admin
+			WHERE a.jenis='keluar' AND (a.harga_beli <> 0 AND a.harga_jual <> 0) $where
+			GROUP BY grup_penjualan
+			ORDER BY tgl_transaksi DESC
+			");
+		return $q->result();
+	}
+
+
+
+public function m_pesanan_member($id_pelanggan='')
+{	
+	$where="";
+	if($id_pelanggan!='')
+	{
+		$where=" AND a.id_pelanggan='$id_pelanggan'";
+	}
+	$q = $this->db->query("
+			SELECT 
+			a.grup_penjualan,
+			SUM(a.sub_total_jual) AS total, 
+			a.diskon,
+			a.tgl_transaksi,
+			a.nama_pembeli,
+			a.hp_pembeli,
+			a.nama_packing,
+			a.tgl_transaksi,
+			a.tgl_trx_manual,
+			a.harga_ekspedisi,
+			a.transport_ke_ekspedisi,
+			a.id_pelanggan,
+			b.nama_admin,
+			b.email_admin 
+		FROM tbl_barang_transaksi a
+		LEFT JOIN tbl_admin b ON a.id_admin=b.id_admin
+		WHERE a.jenis='pending_member' AND (a.harga_beli <> 0 AND a.harga_jual <> 0) $where
+		GROUP BY grup_penjualan
+		ORDER BY tgl_transaksi DESC
+		");
+	return $q->result();
+}
+
+	public function m_lap_pending($id_admin='')
+	{	
+		$where="";
+		if($id_admin!='')
+		{
+			$where=" AND a.id_admin='$id_admin'";
+		}
+
+
+		$q = $this->db->query("
+				SELECT 
+				a.grup_penjualan,
+				SUM(a.sub_total_jual) AS total, 
+				a.diskon,
+				a.tgl_transaksi,
+				a.nama_pembeli,
+				a.hp_pembeli,
+				a.nama_packing,
+				a.tgl_transaksi,
+				a.tgl_trx_manual,
+				a.harga_ekspedisi,
+				a.transport_ke_ekspedisi,
+				a.id_pelanggan,
+				b.nama_admin,
+				b.email_admin 
+			FROM tbl_barang_transaksi a
+			LEFT JOIN tbl_admin b ON a.id_admin=b.id_admin
+			WHERE a.jenis='pending_keluar' AND (a.harga_beli <> 0 AND a.harga_jual <> 0) $where
+			GROUP BY grup_penjualan
+			ORDER BY tgl_transaksi DESC
+			");
+		return $q->result();
+	}
+
+	public function notif_pending($id_admin='')
+	{	
+		$where="";
+		if($id_admin!='')
+		{
+			$where=" AND a.id_admin='$id_admin'";
+		}
+
+
+		$q = $this->db->query("
+				SELECT 
+				a.grup_penjualan,
+				SUM(a.sub_total_jual) AS total, 
+				a.diskon,
+				a.tgl_transaksi,
+				a.nama_pembeli,
+				a.hp_pembeli,
+				a.nama_packing,
+				a.tgl_transaksi,
+				a.tgl_trx_manual,
+				a.harga_ekspedisi,
+				a.transport_ke_ekspedisi,
+				a.id_pelanggan,
+				b.nama_admin,
+				b.email_admin 
+			FROM tbl_barang_transaksi a
+			LEFT JOIN tbl_admin b ON a.id_admin=b.id_admin
+			WHERE a.jenis='pending_keluar' AND (a.harga_beli <> 0 AND a.harga_jual <> 0) $where
+			GROUP BY grup_penjualan
+			ORDER BY tgl_transaksi DESC
+			");
+		return $q->num_rows();
+	}
+
+
+	public function m_log_pindah_gudang()
+	{
+		$q = $this->db->query("
+							SELECT a.tgl,a.jumlah,a.catatan,
+								   b.nama_gudang AS nama_gudang_lama,
+								   c.nama_gudang AS nama_gudang_baru,
+								   CONCAT(d.id,'#',d.nama_barang) AS nama_barang,
+								   e.nama_admin
+								FROM tbl_log_pemindahan_gudang a
+								LEFT JOIN tbl_gudang b ON a.id_gudang_lama=b.id_gudang
+								LEFT JOIN tbl_gudang c ON a.id_gudang_baru=c.id_gudang
+								LEFT JOIN tbl_barang d ON a.id_barang=d.id 
+								LEFT JOIN tbl_admin e ON a.id_admin=e.id_admin
+							ORDER BY tgl DESC
+
+
+			");
+
+		return $q->result();
+	}
+
 
 	public function tambah_data($serialize)
 	{
@@ -318,6 +594,12 @@ if (!defined('BASEPATH'))exit('No direct script access allowed');
 	{		
 		$this->db->where('id',$id);
 		$this->db->delete('tbl_barang');
+	}
+
+	public function m_hapus_pending($grup_penjualan)
+	{
+		$this->db->where('grup_penjualan',$grup_penjualan);
+		$this->db->delete('tbl_barang_transaksi');
 	}
 
 

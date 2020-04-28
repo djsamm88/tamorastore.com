@@ -1,59 +1,3 @@
-<?php
-$all_template = ""; 
-$saldo = 0;
-if(isset($group_penjualan))
-{
-  $data = $this->m_barang->m_detail_penjualan($group_penjualan);    
-  $saldo = rupiah($data[0]->saldo);
-  $z=0;
-  foreach ($data as $pend) {
-    $sel_retail = $pend->satuan_jual=='retail'?'selected':'';
-    $sel_lusin = $pend->satuan_jual=='lusin'?'selected':'';
-    $sel_koli = $pend->satuan_jual=='koli'?'selected':'';
-
-    $stok = $this->m_barang->m_stok_by_id_barang(1,$pend->id)->result()[0]->qty;
-
-    $pilihan = "<option value='retail' $sel_retail>Retail</option>
-                <option value='lusin'  $sel_lusin>Lusin</option>
-                <option value='koli' $sel_koli>Koli</option>
-                ";
-
-
-    $template = "<tr>
-                    <td>
-                      <input id='jum_per_koli' type='hidden' value='$pend->jum_per_koli'>
-                      <input id='jum_per_lusin' type='hidden' value='$pend->jum_per_lusin'>
-                      <input id='id_barang' name='id_barang[$z]' type='hidden' value='$pend->id'>
-                      $pend->id
-                    </td>
-                    <td id='stoknya'>$stok</td>
-                    <td>$pend->nama_barang</td>
-                    <td>
-                      <select name='satuan_jual[$z]' class='form-control' id='pilihSatuan' onchange='gantiHarga($pend->harga_retail,$pend->harga_lusin,$pend->harga_koli,$pend->jum_per_koli,$pend->jum_per_lusin,$(this))'>
-                        $pilihan
-                      </select>
-                    </td>
-                    <td align='right'>
-                      <input  id='t4_harga' class='form-control' readonly name='harga_jual[$z]' value='".rupiah($pend->harga_jual)."'>
-                    </td>
-                    <td>
-                      <input class='form-control' type='number' id='jumlah_beli' name='jumlah[$z]'  placeholder='qty' required value='$pend->qty_jual'>
-                    </td>
-                    <td align='right' id='t4_sub_total'>".rupiah($pend->sub_total_jual)."</td>
-                    <td>
-                      <button class='btn btn-danger btn-xs' id='remove_order' type='button'>Hapus</button>
-                    </td>
-                  </tr>";
-
-    $all_template .=$template;
-
-    $z++;
-  }
-
-}else{
-  $group_penjualan="";
-}
-?>
 
 <!-- Content Header (Page header) -->
     <section class="content-header">
@@ -88,21 +32,18 @@ if(isset($group_penjualan))
 <form id="penjualan_barang">
   <div class="row">
   
-  <div class="col-sm-3">
-    <input type="text" name="nama_pembeli" id="nama_pembeli" value="<?php echo @$data[0]->nama_pembeli?>" class="form-control" required placeholder="Nama pembeli">
-    <input type="hidden" name="id_pelanggan" id="id_pelanggan" value="<?php echo @$data[0]->id_pelanggan?>">
+  <div class="col-sm-4">
+    <input type="text" name="nama_pembeli" id="nama_pembeli" value="<?php echo $pelanggan->nama_pembeli?>" class="form-control" required placeholder="Nama pembeli" readonly>
+    <input type="hidden" name="id_pelanggan" id="id_pelanggan" value="<?php echo $pelanggan->id_pelanggan?>">
     <small><i>Nama Pembeli</i></small>
   </div>
-  <div class="col-sm-3">
-    <input type="text" name="hp_pembeli" id="hp_pembeli" value="<?php echo @$data[0]->hp_pembeli?>" class="form-control" required placeholder="HP pembeli">
+  <div class="col-sm-4">
+    <input type="text" name="hp_pembeli" id="hp_pembeli" value="<?php echo $pelanggan->hp_pembeli?>" class="form-control" required placeholder="HP pembeli" readonly>
     <small><i>HP Pembeli</i></small>
   </div>
-  <div class="col-sm-3">
-    <input type="text" name="nama_packing" value="<?php echo @$data[0]->nama_packing?>" class="form-control" placeholder="Nama Packing">
-    <small><i>Nama Packing</i></small>
-  </div>
-  <div class="col-sm-3">
-    <input type="text" name="tgl_trx_manual" value="<?php echo date('Y-m-d H:i:s')?>" class="form-control datepicker">
+  
+  <div class="col-sm-4">
+    <input type="text" name="tgl_trx_manual" value="<?php echo date('Y-m-d H:i:s')?>" class="form-control datepicker" readonly>
     <small><i>Format Y-m-d H:i:s</i></small>
     <input type="hidden" name="grup_penjualan" value="<?php echo date('ymdHis')?>" class="form-control " readonly>
   </div>
@@ -117,8 +58,7 @@ if(isset($group_penjualan))
       <thead>
         <tr>
               
-              <th width="10px">Id</th>           
-              <th width="10px">Stok</th>                                   
+              <th width="10px">Id</th>                                                      
               <th>Barang</th>                                   
               <th>Satuan</th>                                   
               <th>Harga</th>                                                 
@@ -131,92 +71,33 @@ if(isset($group_penjualan))
         </tr>
       </thead>
       <tbody id="t4_order">
-        <?php echo $all_template?>
+        
       </tbody>
       <tfoot>
 
         <tr>
-          <td colspan="6" align="right"><b>Saldo</b></td>
+          <td colspan="5" align="right"><b>Saldo</b></td>
           <td  align="right" >
-            <input id="t4_saldo" type="text" name="saldo" class="form-control nomor" value="<?php echo $saldo?>" style="text-align:right;" readonly>
+            <input id="t4_saldo" type="text" name="saldo" class="form-control nomor" value="0" style="text-align:right;" readonly>
           </td>
-          <td></td>
-        </tr>
-
-
-        <tr>
-          <td colspan="6" align="right"><b>Diskon</b></td>
-          <td  align="right" >
-            <input id="t4_diskon" type="text" name="diskon" class="form-control nomor" value="0" style="text-align:right;">
-          </td>
-          <td></td>
-        </tr>
-
-
-        <td colspan="6" align="right"><b>Biaya ke ekspedisi</b></td>
-          <td  align="right" >
-            <input id="t4_transport_ke_ekspedisi" type="text" name="transport_ke_ekspedisi" class="form-control nomor" value="0" style="text-align:right;">
-          </td>
-          <td></td>
-        </tr>
-        
-        <tr>
-          <td colspan="6" align="right"><b>Ekspedisi</b></td>
-          <td id="" align="right" >
-            <div class="row">
-            <div class="col-sm-6">
-            <select name="nama_ekspedisi" class="form-control" id="nama_ekspedisi">
-                <option value="">--Pilih---</option>
-                <?php 
-                  foreach ($eksepedisi as $eks) {
-                    echo "<option value='$eks->nama_ekspedisi'>$eks->nama_ekspedisi</option>";
-                  }
-                ?>
-              </select>
-            </div>
-            <div class="col-sm-6">
-              <input id="t4_ekspedisi" type="text" name="harga_ekspedisi" class="form-control nomor" value="0" style="text-align:right;">
-            </div>
-            </div>
-          </td>              
           <td></td>
         </tr>
 
 
 
         <tr>
-          <td colspan="6" align="right"><b>Total</b></td>
+          <td colspan="5" align="right"><b>Total</b></td>
           <td id="t4_total" align="right" style="font-weight: bold;"></td><td></td>
         </tr>
 
-        <tr>
-          <td colspan="6" align="right"><b>Bayar</b></td>
-          <td  align="right" >
-          <input id="t4_bayar" type="text"  class="form-control nomor" name="bayar" value="" required style="text-align:right;">
-          </td>
-          <td></td>
-        </tr>
-
-
-
-        <tr>
-          <td colspan="6" align="right"><b>Selisih</b></td>
-          <td  align="right" id="t4_kembali">
-          
-          </td>
-          <td></td>
-        </tr>
 
       </tfoot>
   </table>
 </div>
   <textarea class="form-control" name="keterangan" placeholder="keterangan"></textarea><br>
-<div class="col-sm-6" style="text-align: left;">
-    <input type="button" value="Pending" class="btn btn-warning" id="simpan_pending"> 
-</div>
 
 <div class="col-sm-6" style="text-align: right;">
-    <input type="submit" value="Bayar" class="btn btn-primary" id="simpan"> 
+    <input type="submit" value="Pesan" class="btn btn-primary" id="simpan"> 
 </div>
 <div style="clear: both;"></div>
 
@@ -248,42 +129,6 @@ $('.datepicker').datepicker({
 notif(); 
 
 total();
-
-$(function(){
-
-    var semuaPelanggan = function(request,response){
-            console.log(request.term);
-            var serialize = {cari:request.term};
-            $.get("<?php echo base_url()?>index.php/barang/json_pelanggan",serialize,
-              function(data){
-                /*
-                response(data);
-                console.log(data);
-                */
-                response($.map(data, function(obj) {
-                    return {
-                        label: obj.nama_pembeli,
-                        value: obj.id_pelanggan,
-                        hp_pembeli: obj.hp_pembeli,
-                        saldo: obj.saldo
-                    };
-                }));
-                
-            })
-          }
-  $("#nama_pembeli").autocomplete({
-      source:semuaPelanggan,
-      minLength:1,
-      select:function(ev,ui){
-        console.log(ui.item.value);
-        $("#id_pelanggan").val(ui.item.value);
-        $("#hp_pembeli").val(ui.item.hp_pembeli);
-        $("#t4_saldo").val(ui.item.saldo);
-        $(this).val(ui.item.label);
-        return false;
-      }
-  })
-})
 
 
 $("#nama_ekspedisi").on("change",function(){
@@ -386,7 +231,7 @@ $( function() {
                         "<input id='id_barang' name='id_barang["+ii+"]' type='hidden' value='"+ui.item.value+"'>";
 
         var template = "<tr>"+                
-                "<td>"+jum_batas+ui.item.value+"</td><td id='stoknya'>"+ui.item.stok+"</td><td>"+ui.item.label+"</td>"+
+                "<td>"+jum_batas+ui.item.value+"</td><td>"+ui.item.label+"</td>"+
                 "<td>"+pilih_satuan+"</td>"+
                 "<td align='right'>"+
                   "<input  id='t4_harga' class='form-control' readonly name='harga_jual["+ii+"]' value='"+formatRupiah(ui.item.harga_retail)+"'>"+
@@ -404,6 +249,7 @@ $( function() {
                   
                   //console.log(template);
               ii++;
+
               //alert(ii);
               return false;
         }
@@ -461,23 +307,13 @@ $("#tbl_datanya").on("click","tbody tr td button#remove_order",function(x){
 
 
 $("#tbl_datanya").on("keydown keyup mousedown mouseup select contextmenu drop","tbody tr td input#jumlah_beli",function(){ 
-
-  console.log($(this).parent().parent().find("#stoknya").html());
   
   var dibeli        = parseInt($(this).val());
-  var stoknya       = parseInt($(this).parent().parent().find("#stoknya").html());
   var jum_per_koli  = parseInt($(this).parent().parent().find("#jum_per_koli").val());
   var jum_per_lusin = parseInt($(this).parent().parent().find("#jum_per_lusin").val());
 
   var pilihSatuan   = $(this).parent().parent().find("#pilihSatuan").val();
 
-  if(dibeli>stoknya)
-  {
-    console.log('jika dibeli lebih besar dari stok');
-    alert("Maksimal stok barang = "+$(this).parent().parent().find("#stoknya").html());
-    $(this).val($(this).parent().parent().find("#stoknya").html());
-    
-  }  
 
   if(pilihSatuan=='koli' && dibeli<jum_per_koli){
     console.log("jum_per_koli"+jum_per_koli);
@@ -542,12 +378,7 @@ function total()
   console.log(total);
 
   var saldo  = parseInt(buang_titik($("#t4_saldo").val()));
-  var diskon = parseInt(buang_titik($("#t4_diskon").val()));
-  var harga_ekspedisi = parseInt(buang_titik($("#t4_ekspedisi").val()));
-  var transport_ke_ekspedisi = parseInt(buang_titik($("#t4_transport_ke_ekspedisi").val()));
-  total+=transport_ke_ekspedisi;
-  total+=harga_ekspedisi;
-  total-=diskon;
+
   total-=saldo;
   $("#t4_total").html(formatRupiah(total));
 }
@@ -560,20 +391,11 @@ $("#penjualan_barang").on("submit",function(){
   }
   if(confirm("Anda yakin selesai?"))
   {
-    /****** hapus dlu pending *******/
-    $.get("<?php echo base_url()?>index.php/barang/hapus_pending/<?php echo $group_penjualan?>",function(){});
-    /****** hapus dlu pending *******/
-
-    $.post("<?php echo base_url()?>index.php/"+classnya+"/go_jual",$(this).serialize(),function(x){
+   
+    $.post("<?php echo base_url()?>index.php/"+classnya+"/go_pesan",$(this).serialize(),function(x){
       console.log(x);
-      
-        window.open("<?php echo base_url()?>index.php/barang/struk_penjualan/"+x);
-
-        eksekusi_controller('<?php echo base_url()?>index.php/barang/form_penjualan',' Kasir');
-
-        console.log("<?php echo base_url()?>index.php/barang/struk_penjualan/"+x);
-
-        notif();   
+      eksekusi_controller('<?php echo base_url()?>index.php/pelanggan/pesanan_member','Pesanan Member');
+        
     })
   
   }
@@ -581,38 +403,6 @@ $("#penjualan_barang").on("submit",function(){
 return false;  
 })
 
-
-
-$("#simpan_pending").on("click",function(){
-  if($("#nama_pembeli").val()=="")
-  {
-    alert("Nama harus isi");
-    $("#nama_pembeli").focus();
-    return false;
-  }
-
-  console.log($("#penjualan_barang").serialize());
-  
-  if(confirm("Anda yakin pending penjualan?"))
-  {
-    /****** hapus dlu pending *******/
-    $.get("<?php echo base_url()?>index.php/barang/hapus_pending/<?php echo $group_penjualan?>",function(){});
-    /****** hapus dlu pending *******/
-
-    $.post("<?php echo base_url()?>index.php/"+classnya+"/go_pending_jual",$("#penjualan_barang").serialize(),function(x){
-      console.log(x);
-      
-        eksekusi_controller('<?php echo base_url()?>index.php/barang/form_penjualan',' Kasir');
-
-        console.log("<?php echo base_url()?>index.php/barang/struk_penjualan/"+x);
-
-        notif();   
-    })
-  
-  }
-  
-return false;  
-})
 
 
 

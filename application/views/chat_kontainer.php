@@ -36,6 +36,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
   <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
   <![endif]-->
 
+  <script src="<?php echo base_url()?>assets/jQuery/jquery-2.2.3.min.js"></script>
+
 <style type="text/css">
   @media (min-width: 768px) {
     .modal-lg {
@@ -89,6 +91,7 @@ desired effect
       <!-- Navbar Right Menu -->
       <div class="navbar-custom-menu">
         <ul class="nav navbar-nav">
+
 
           <?php 
             if($this->session->userdata('level') ==1 || $this->session->userdata('level') ==3)
@@ -203,8 +206,8 @@ desired effect
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper" id="">
       
-      <?php include "isi.php"?>
-      <?php //var_dump($session['nama_admin'])?>
+      <?php include "chat_isi.php"?>
+      
     
   </div>
 
@@ -406,53 +409,9 @@ $(document).ready(function(){
   })
 
 
-function notifyMe(notifnya) {
-  // Let's check if the browser supports notifications
-  if (!("Notification" in window)) {
-    alert("This browser does not support desktop notification");
-  }
 
-  // Let's check whether notification permissions have already been granted
-  else if (Notification.permission === "granted") {
-    // If it's okay let's create a notification
-    var notification = new Notification(notifnya);
-  }
 
-  // Otherwise, we need to ask the user for permission
-  else if (Notification.permission !== "denied") {
-    Notification.requestPermission().then(function (permission) {
-      // If the user accepts, let's create a notification
-      if (permission === "granted") {
-        var notification = new Notification(notifnya);
-      }
-    });
-  }
 
-  // At last, if the user has denied notifications, and you 
-  // want to be respectful there is no need to bother them any more.
-}
-
-<?php 
-if($this->session->userdata('level')==1 || $this->session->userdata('level')==3){
-?>
-/******* chat *********/
-var chatsRef = dbRef.child('chat');
-var newItems = false;
-chatsRef.on("child_added", function(snap){
-  if(snap.val().kpd_id=='kasir' && snap.val().baca=="belum")
-  {
-    //*********************notification********************************************//
-    new Audio("<?php echo base_url()?>assets_chat/notif.mp3").play();
-    //doNotification (snap.val().dari_nama,snap.val().isi,snap.val().tgl);
-    notifyMe(snap.val().dari_nama,snap.val().isi);
-    document.title = snap.val().dari_nama,snap.val().isi;
-    //*********************notification********************************************//      
-    data_count_kasir()
-  }
-  if (!newItems) return;    
-});
-/******** chat **********/
-<?php } ?>
 function data_count_kasir()
 {
   $.get("<?php echo base_url()?>index.php/chat/data_count_kasir",function(e){
@@ -468,6 +427,8 @@ function data_notif_kasir()
     $(".t4_notif_chat").html(e);
   })
 }
+
+
 
   function notif_member()
   {
@@ -550,113 +511,6 @@ function data_notif_kasir()
 
 
 
-
-  $(function () {    
-    /* ChartJS
-     * -------
-     * Here we will create a few charts using ChartJS
-     */
-
-    //--------------
-    //- AREA CHART -
-    //--------------
-    <?php
-    $tgl = ""; 
-    $debet = "";
-    $kredit = "";
-    foreach ($m_chart as $key) {
-      $tgl .= "'".$key->tanggal."',";
-      $debet .= $key->debet.',';
-      $kredit .= $key->kredit.',';
-    }
-    ?>
-    
-
-
-    var areaChartData = {
-      
-      labels  : [<?php echo $tgl?>],
-      datasets: [
-        {
-          label               : 'Kredit',
-          fillColor           : 'rgba(210, 214, 222, 1)',
-          strokeColor         : 'rgba(210, 214, 222, 1)',
-          pointColor          : 'rgba(210, 214, 222, 1)',
-          pointStrokeColor    : '#c1c7d1',
-          pointHighlightFill  : '#fff',
-          pointHighlightStroke: 'rgba(220,220,220,1)',
-          data                : [<?php echo rtrim($kredit,',')?>]          
-          //data                : [30, 38, 50, 19, 86, 27, 90]
-          //data                : [269920010,1000000,22119990]
-
-        },
-        {
-          label               : 'Debet',
-          fillColor           : 'rgba(60,141,188,0.9)',
-          strokeColor         : 'rgba(60,141,188,0.8)',
-          pointColor          : '#3b8bba',
-          pointStrokeColor    : 'rgba(60,141,188,1)',
-          pointHighlightFill  : '#fff',
-          pointHighlightStroke: 'rgba(60,141,188,1)',
-          //data                : [28, 48, 40, 19, 86, 27, 90]
-          data                : [<?php echo rtrim($debet,',')?>]
-          //data                : [205479850,1500000,38299970]
-
-        }
-      ]
-    }
-
-     var areaChartOptions = {
-      //Boolean - If we should show the scale at all
-      showScale               : true,
-      //Boolean - Whether grid lines are shown across the chart
-      scaleShowGridLines      : false,
-      //String - Colour of the grid lines
-      scaleGridLineColor      : 'rgba(0,0,0,.05)',
-      //Number - Width of the grid lines
-      scaleGridLineWidth      : 1,
-      //Boolean - Whether to show horizontal lines (except X axis)
-      scaleShowHorizontalLines: true,
-      //Boolean - Whether to show vertical lines (except Y axis)
-      scaleShowVerticalLines  : true,
-      //Boolean - Whether the line is curved between points
-      bezierCurve             : true,
-      //Number - Tension of the bezier curve between points
-      bezierCurveTension      : 0.3,
-      //Boolean - Whether to show a dot for each point
-      pointDot                : false,
-      //Number - Radius of each point dot in pixels
-      pointDotRadius          : 4,
-      //Number - Pixel width of point dot stroke
-      pointDotStrokeWidth     : 1,
-      //Number - amount extra to add to the radius to cater for hit detection outside the drawn point
-      pointHitDetectionRadius : 20,
-      //Boolean - Whether to show a stroke for datasets
-      datasetStroke           : true,
-      //Number - Pixel width of dataset stroke
-      datasetStrokeWidth      : 2,
-      //Boolean - Whether to fill the dataset with a color
-      datasetFill             : true,
-      //String - A legend template
-      legendTemplate          : '<ul class="<%=name.toLowerCase()%>-legend"><% for (var i=0; i<datasets.length; i++){%><li><span style="background-color:<%=datasets[i].lineColor%>"></span><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>',
-      //Boolean - whether to maintain the starting aspect ratio or not when responsive, if set to false, will take up entire container
-      maintainAspectRatio     : true,
-      //Boolean - whether to make the chart responsive to window resizing
-      responsive              : true
-    }
-
-    //Create the line chart
-    //areaChart.Line(areaChartData, areaChartOptions)
-//-------------
-    //- LINE CHART -
-    //--------------
-    var lineChartCanvas          = $('#lineChart').get(0).getContext('2d')
-    var lineChart                = new Chart(lineChartCanvas)
-    var lineChartOptions         = areaChartOptions
-    lineChartOptions.datasetFill = false
-    lineChart.Line(areaChartData, lineChartOptions)
-
-})
 </script>
 </body>
 </html>

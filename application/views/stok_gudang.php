@@ -46,6 +46,7 @@
         foreach($gudang as $x)
         {
           $btn = "<button class='btn btn-warning btn-xs' onclick='tampil($x->id_gudang);return false;'>Tampil</button>";
+          $btn .= "<a href='".base_url()."index.php/barang/stok_gudang_xl/$x->id_gudang' class='btn btn-primary btn-xs' target='blank'>Excel</button>";
 
           $yg_warning = $this->m_barang->m_notif_stok($x->id_gudang)->num_rows();
 
@@ -99,7 +100,7 @@
         {
           
           $class  = $s->reminder > $s->qty?"danger":"";
-          $pindah = $s->reminder > $s->qty?"":"<button class='btn btn-primary btn-xs' onclick='pindahkan($s->id,$s->id_gudang)'>Pindahkan</button>";
+          $pindah = $s->qty>0?"<button class='btn btn-primary btn-xs' onclick='pindahkan($s->id,$s->id_gudang)'>Pindahkan</button>":"";
 
 
 
@@ -191,6 +192,16 @@
             </div>
             <div style="clear:both"></div>
             <br>
+
+
+            <div class="col-sm-4 ">catatan</div>
+            <div class="col-sm-8">              
+              <textarea class="form-control" name="catatan" id="catatan" required></textarea>              
+            </div>
+            <div style="clear:both"></div>
+            <br>
+
+            
 
 
 

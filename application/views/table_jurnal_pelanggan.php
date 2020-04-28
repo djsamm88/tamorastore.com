@@ -73,7 +73,7 @@
                   <tr>
                     <td>$no</td>
                     <td>$key->id</td>
-                    <td>".tglindo($key->tanggal)."</td>
+                    <td>".($key->tanggal)."</td>
                     <td>$key->group_trx</td>
                     <td>$key->keterangan</td>
                     <td><a href='".base_url()."/uploads/$key->url_bukti' target='blank' >$key->url_bukti</a></td>

@@ -10,8 +10,6 @@ if (!defined('BASEPATH'))exit('No direct script access allowed');
 		}
 
 
-
-
 	public function m_data_admin()
 	{
 		$q = $this->db->query("SELECT a.* FROM tbl_admin a ");

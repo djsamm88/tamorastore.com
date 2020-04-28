@@ -11,7 +11,40 @@ class M_login extends CI_Model {
 
 	public function cek_user($user,$pass) {
 		
-		$query = $this->db->query("SELECT * FROM tbl_admin  WHERE (user_admin='$user' AND pass_admin='$pass') OR (email_admin='$user' AND pass_admin='$pass')");			
+		//$query = $this->db->query("SELECT * FROM tbl_admin  WHERE (user_admin='$user' AND pass_admin='$pass') OR (email_admin='$user' AND pass_admin='$pass')");
+
+		$query = $this->db->query("
+					SELECT * FROM 
+						(
+							SELECT 
+								id_admin,
+								email_admin,
+								user_admin,
+								nama_admin,
+								pass_admin,
+								level,
+								status_admin
+
+								FROM tbl_admin a 
+
+								UNION ALL 
+
+								SELECT 
+								id_pelanggan AS id_admin,
+								email_pembeli AS email_admin,
+								email_pembeli AS user_admin,
+								nama_pembeli AS nama_admin,
+								MD5(password) AS pass_admin,
+								'5' AS level,
+								'1' AS status_admin
+
+								FROM `tbl_pelanggan` WHERE status='member'
+
+						)a 
+					WHERE (user_admin='$user' AND pass_admin='$pass') OR (email_admin='$user' AND pass_admin='$pass')
+
+			");
+
 		return $query;
 	}
 

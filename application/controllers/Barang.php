@@ -24,6 +24,7 @@ class Barang extends CI_Controller {
 	}
 
 
+
 	public function form_barang_sementara()
 	{
 		$data['all'] = $this->m_barang->m_data();	
@@ -55,7 +56,7 @@ class Barang extends CI_Controller {
 		echo json_encode($serialize);
 	}
 
-	public function go_jual()
+	public function go_pending_jual()
 	{
 		$data = $this->input->post();
 
@@ -80,17 +81,110 @@ class Barang extends CI_Controller {
 		//var_dump($data);
 		$total_tanpa_diskon =0; 
 		$total_harga_beli 	=0; 
-		foreach ($data['harga_jual'] as $key => $harga_jual) {
+		$id_barang = $data['id_barang'];
+
+		for($i=0;$i<count($id_barang);$i++) {
+			//$data['harga_jual'] as $key => $harga_jual
+			$key=$i;
+			$id = $id_barang[$i];
+			$harga_jual = $data['harga_jual'][$i];
 			# code...
 			//echo $key;
 			/********** mengambil detail barang dari db***********/
-			$q_detail_barang = $this->m_barang->m_by_id($key);
+			$q_detail_barang = $this->m_barang->m_by_id($id);
 			$barang = $q_detail_barang[0];
 			/********** mengambil detail barang dari db***********/
 
 
 			$serialize['id_admin'] 		= $this->session->userdata('id_admin');
-			$serialize['id_barang'] 	= $key;
+			$serialize['id_barang'] 	= $id;
+			$serialize['harga_jual'] 	= hanya_nomor($harga_jual);
+			$serialize['satuan_jual'] 	= $data['satuan_jual'][$key];
+			$serialize['jenis'] 		= 'pending_keluar';
+			$serialize['grup_penjualan'] = $data['grup_penjualan'];		
+
+			$serialize['id_pelanggan'] 	= $id_pelanggan;
+			$serialize['nama_pembeli'] 	= $data['nama_pembeli'];
+			$serialize['hp_pembeli'] 	= $data['hp_pembeli'];
+			
+			$serialize['nama_packing'] 	= $data['nama_packing'];
+			$serialize['tgl_trx_manual']= $data['tgl_trx_manual'];
+			$serialize['keterangan']	= $data['keterangan'];
+
+			$serialize['diskon'] 		= hanya_nomor($data['diskon']);
+			$serialize['saldo'] 		= hanya_nomor($data['saldo']);
+
+			$serialize['bayar'] 		= hanya_nomor($data['bayar']);
+			$serialize['transport_ke_ekspedisi'] = hanya_nomor($data['transport_ke_ekspedisi']);
+			$serialize['harga_ekspedisi'] 		 = hanya_nomor($data['harga_ekspedisi']);
+			$serialize['nama_ekspedisi'] 		 = ($data['nama_ekspedisi']);
+			
+			$serialize['sub_total_jual']= $serialize['harga_jual']*$data['jumlah'][$key];
+			$serialize['sub_total_beli']= $barang->harga_pokok*$data['jumlah'][$key];
+			$serialize['qty_jual']		= $data['jumlah'][$key];
+			$serialize['jum_per_koli']	= $barang->jum_per_koli;
+			$serialize['harga_beli']	= $barang->harga_pokok;
+			$serialize['id_gudang']		= '1';
+			
+
+
+			$serialize['jumlah'] = $data['jumlah'][$key];
+
+			/************ insert ke tbl_barang_transaksi *************/
+			$this->m_barang->insert_trx_barang($serialize);
+			/************ insert ke tbl_barang_transaksi *************/
+
+			$total_tanpa_diskon	+=$serialize['sub_total_jual'];
+			$total_harga_beli	+=$serialize['sub_total_beli'];
+		}
+
+
+		echo $data['grup_penjualan'];
+	}
+
+	public function go_jual()
+	{
+		$data = $this->input->post();
+
+
+		/********* insert pelanggan ************/
+		$arrPelanggan = array(
+				"nama_pembeli" 	=>$data['nama_pembeli'],
+				"hp_pembeli" 	=>$data['hp_pembeli'],
+				"tgl_daftar" 	=>date('Y-m-d H:i:s')
+		);
+		if($data['id_pelanggan']=="")
+		{
+			$id_pelanggan = $this->m_pelanggan->insert($arrPelanggan);
+		}else{
+			$id_pelanggan 	= $data['id_pelanggan'];
+			$arrUpdate 		= array(
+								"tgl_trx_terakhir"=>date('Y-m-d H:i:s')
+							  );
+			$this->m_pelanggan->update($arrUpdate,$id_pelanggan);
+		}
+		/********* insert pelanggan ************/
+
+		//var_dump($data);
+		$total_tanpa_diskon =0; 
+		$total_harga_beli 	=0; 
+		$id_barang = $data['id_barang'];
+
+		for($i=0;$i<count($id_barang);$i++) {
+			//$data['harga_jual'] as $key => $harga_jual
+			$key=$i;
+			$id = $id_barang[$i];
+			$harga_jual = $data['harga_jual'][$i];
+			# code...
+			//echo $key;
+			/********** mengambil detail barang dari db***********/
+			$q_detail_barang = $this->m_barang->m_by_id($id);
+			$barang = $q_detail_barang[0];
+			/********** mengambil detail barang dari db***********/
+
+
+			$serialize['id_admin'] 		= $this->session->userdata('id_admin');
+			$serialize['id_barang'] 	= $id;
 			$serialize['harga_jual'] 	= hanya_nomor($harga_jual);
 			$serialize['satuan_jual'] 	= $data['satuan_jual'][$key];
 			$serialize['jenis'] 		= 'keluar';
@@ -271,8 +365,39 @@ class Barang extends CI_Controller {
 		$data['all'] = $this->m_barang->m_data_gudang(1)->result();		
 		$data['pelanggan'] = $this->m_pelanggan->m_data();	
 		$data['eksepedisi'] = $this->m_ekspedisi->m_data();	
+
 		$this->load->view('form_penjualan_barang',$data);
 	}
+
+	public function pesanan_by_group($grup_penjualan)
+	{
+		header("Access-Control-Allow-Origin: *");
+		header("Access-Control-Allow-Headers: *");
+		header('Content-Type: application/json');
+		$data = $this->m_barang->m_detail_penjualan($grup_penjualan);
+		echo json_encode($data);	
+
+	}
+	public function json_pelanggan()
+	{
+		header("Access-Control-Allow-Origin: *");
+		header("Access-Control-Allow-Headers: *");
+		header('Content-Type: application/json');	
+		$query = $this->input->get('cari'); 
+		$data['all'] = $this->m_pelanggan->m_data_autocomplete($query);
+		echo json_encode($data['all']);	
+	}
+
+	public	function json_barang_toko()
+	{
+		header("Access-Control-Allow-Origin: *");
+		header("Access-Control-Allow-Headers: *");
+		header('Content-Type: application/json');	
+		$query = $this->input->get('cari'); 
+		$data['all'] = $this->m_barang->m_data_gudang_autocomplete(1,$query)->result();
+		echo json_encode($data['all']);
+	}
+
 
 	public function struk_penjualan($group_penjualan)
 	{
@@ -345,6 +470,19 @@ class Barang extends CI_Controller {
 	{
 		$data['all'] = $this->m_barang->m_data();	
 		$this->load->view('data_barang',$data);
+
+	}
+
+
+	public function data_xl()
+	{
+		$file="Master_barang.xls";
+		header("Content-type: application/octet-stream");
+		header("Content-Disposition: attachment; filename=$file");
+		header("Pragma: no-cache");
+		header("Expires: 0");	
+		$data['all'] = $this->m_barang->m_data();	
+		$this->load->view('data_barang_xl',$data);
 	}
 
 
@@ -353,6 +491,28 @@ class Barang extends CI_Controller {
 		$data['all'] = $this->m_barang->m_return_barang();	
 		$data['all_barang'] = $this->m_barang->m_data();	
 		$this->load->view('return_barang',$data);
+	}
+
+	public function return_barang_ke_suplier($id)
+	{		
+		$this->db->query("UPDATE tbl_barang_return SET status='suplier' WHERE id='$id'");
+		echo "UPDATE tbl_barang_return SET status='suplier' WHERE id='$id'";
+	}
+
+
+	public function return_barang_xl($kondisi=null)
+	{
+		$file="Laporan_barang_return.xls";
+		
+		
+		header("Content-type: application/octet-stream");
+		header("Content-Disposition: attachment; filename=$file");
+		header("Pragma: no-cache");
+		header("Expires: 0");	
+
+
+		$data['all'] = $this->m_barang->m_return_barang($kondisi);
+		$this->load->view('print_return_barang',$data);
 	}
 
 
@@ -445,6 +605,14 @@ class Barang extends CI_Controller {
 		/********** jika kondisi=baik masuk ke barang ***************/
 	}
 
+
+	public function log_pindah_gudang()
+	{
+		$data['all'] = $this->m_barang->m_log_pindah_gudang();
+		$this->load->view('log_pindah_gudang',$data);
+
+	}
+
 	public function pindah_gudang()
 	{
 		$data = $this->input->post();
@@ -452,6 +620,7 @@ class Barang extends CI_Controller {
 		$qty 		= $data['jumlah'];
 		$id_gudang	= $data['id_gudang'];		
 		$id_barang 	= $data['id_barang'];
+		$catatan	= $data['catatan'];
 
 		//tambah ke gudang baru
 		$this->db->query("INSERT INTO tbl_barang_transaksi 
@@ -471,14 +640,88 @@ class Barang extends CI_Controller {
 							id_barang='$id_barang',
 							id_gudang='$id_gudang_lama'
 						");
-	
+		
+		//catat log
+		$id_admin = $this->session->userdata('id_admin');
+		$this->db->query("INSERT INTO tbl_log_pemindahan_gudang 
+							SET 
+							id_gudang_lama='$id_gudang_lama', 
+							id_gudang_baru='$id_gudang',								
+							id_barang='$id_barang',
+							jumlah='$qty',
+							catatan='$catatan',
+							id_admin='$id_admin'
+
+						");
+		
+			
 	}
 
 
 	public function lap_penjualan()
 	{
-		$data['all'] = $this->m_barang->m_lap_penjualan();	
+		$id_admin 	= $this->session->userdata('id_admin');
+		$level 		= $this->session->userdata('level');
+
+		if($level=='1')
+		{
+			$id_admin="";
+		}
+
+		$data['all'] = $this->m_barang->m_lap_penjualan($id_admin);	
 		$this->load->view('lap_penjualan',$data);
+	}
+
+
+
+	public function lap_pending()
+	{
+		$id_admin 	= $this->session->userdata('id_admin');
+		$level 		= $this->session->userdata('level');
+
+		if($level=='1')
+		{
+			$id_admin="";
+		}
+
+		$data['all'] = $this->m_barang->m_lap_pending($id_admin);	
+		$this->load->view('lap_pending',$data);
+	}
+
+
+
+	public function pesanan_member()
+	{
+		
+		$data['all'] = $this->m_barang->m_pesanan_member("");	
+		$this->load->view('data_pesanan_member',$data);
+	}
+
+
+	public function hapus_pending($grup_penjualan)
+	{
+		$this->m_barang->m_hapus_pending($grup_penjualan);
+	}
+
+	public function form_penjualan_pending($group_penjualan)
+	{
+
+		$data['all'] = $this->m_barang->m_data_gudang(1)->result();		
+		$data['pelanggan'] = $this->m_pelanggan->m_data();	
+		$data['eksepedisi'] = $this->m_ekspedisi->m_data();	
+		$data['group_penjualan'] = $group_penjualan;
+		$this->load->view('form_penjualan_barang',$data);
+
+	}
+
+	
+	public function penjualan_by_group($group_penjualan)
+	{
+		header("Access-Control-Allow-Origin: *");
+		header("Access-Control-Allow-Headers: *");
+		header('Content-Type: application/json');	
+		echo json_encode($this->m_barang->m_detail_penjualan($group_penjualan));		
+		
 	}
 
 
@@ -511,8 +754,21 @@ class Barang extends CI_Controller {
 		//$data['semu_stok_gudang'] = $semu_stok_gudang;
 		$data['semu_stok_gudang'] = $this->m_barang->m_notif_stok(1)->num_rows();
 		
+
+		$id_admin 	= $this->session->userdata('id_admin');
+		$level 		= $this->session->userdata('level');
+
+		if($level=='1')
+		{
+			$id_admin="";
+		}
+		$data['jum_pending'] = ($this->m_barang->notif_pending($id_admin));	
 		/******* stok gudang *****/
+		$data['jum_pesanan_member'] = count($this->m_barang->m_pesanan_member(""));
+		$data['jum_pesanan_ku'] = count($this->m_barang->m_pesanan_member($this->session->userdata('id_admin')));
 		echo json_encode($data);
+
+
 	}
 
 
@@ -536,6 +792,34 @@ class Barang extends CI_Controller {
 		/****** array gudang yg kosong *****/
 
 		$this->load->view('stok_gudang',$data);
+	}
+
+
+
+	public function stok_gudang_xl($id_gudang)
+	{
+		$file = "Stok_gudang.xls";
+		header("Content-type: application/octet-stream");
+		header("Content-Disposition: attachment; filename=$file");
+		header("Pragma: no-cache");
+		header("Expires: 0");	
+		$data['stok'] = $this->m_barang->m_data_gudang($id_gudang);	
+		$data['gudang'] = $this->m_gudang->m_data();
+
+		/****** array gudang yg kosong *****/
+		$q = $this->m_barang->m_notif_stok();
+		$warning=array();
+		foreach ($q->result() as $key) {
+			
+			if($key->reminder > $key->qty)
+			{
+				array_push($warning, $key->id_gudang);
+			}
+		}
+		$data['warning'] = array_unique($warning);	
+		/****** array gudang yg kosong *****/
+
+		$this->load->view('stok_gudang_xl',$data);
 	}
 
 	public function go_beli()
@@ -641,11 +925,13 @@ class Barang extends CI_Controller {
 
 		if($id=='')
 		{
-			
+			$serialize['gambar'] = upload_file('gambar');
 			$this->m_barang->tambah_data($serialize);
 			die('1');
 		}else{
-
+			if(upload_file('gambar')!=""){
+				$serialize['gambar'] = upload_file('gambar');	
+			}
 			$this->m_barang->update_data($serialize,$id);
 			die('1');			
 

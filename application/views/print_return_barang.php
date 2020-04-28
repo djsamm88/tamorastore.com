@@ -3,7 +3,9 @@
 body{
   font-size: 12px;
 }
-
+table{
+    border-collapse: collapse;
+}
 table tr td, th  { 
   
   font-size: 12px; padding:5px;
@@ -12,12 +14,16 @@ table tr td, th  {
 }
 table th{
       text-align: center;
+        border: 1px solid black;
+
       
     }
 
 td {
       
       padding:5px;
+        border: 1px solid black;
+
       
     }
 </style>

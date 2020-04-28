@@ -70,7 +70,11 @@
                 <td align=right>".rupiah($x->harga_ekspedisi)."</td>                
                 <td align=right>".rupiah($x->transport_ke_ekspedisi)."</td>                
                 <td align=right>".rupiah($x->total-$x->diskon+($x->harga_ekspedisi+$x->transport_ke_ekspedisi))."</td>                
-                <td><a href='".base_url()."index.php/barang/struk_penjualan/".$x->grup_penjualan."' target='blank'>Print</a></td>                                
+                <td>
+                  <button class='btn btn-primary btn-block btn-xs' onclick='proses_pending($x->grup_penjualan)'>Proses</button>
+
+                    <button class='btn btn-danger btn-block btn-xs' onclick='hapus_pending($x->grup_penjualan)'>Hapus</button>
+                </td>                                
               </tr>
           ");
           
@@ -98,7 +102,22 @@
 console.log("<?php echo $this->router->fetch_class();?>");
 var classnya = "<?php echo $this->router->fetch_class();?>";
 
+function proses_pending(group_penjualan)
+{
+  eksekusi_controller('<?php echo base_url()?>index.php/barang/form_penjualan_pending/'+group_penjualan,'Penjualan Pending');
+}
 
+
+function hapus_pending(group_penjualan)
+{
+  if(confirm("Anda yakin?"))
+  {
+    $.get("<?php echo base_url()?>index.php/barang/hapus_pending/"+group_penjualan,function(){
+        eksekusi_controller('<?php echo base_url()?>index.php/barang/lap_pending/','Penjualan Pending');  
+      })
+  }
+  
+}
 
 $(document).ready(function(){
 

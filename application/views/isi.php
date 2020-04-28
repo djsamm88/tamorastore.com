@@ -13,7 +13,27 @@
       <!--------------------------
         | Your Page Content Here |
         -------------------------->    
-<!-- Default box -->
+      
+    
+        <?php 
+        
+        if($this->session->userdata('level')=='1' || $this->session->userdata('level')=='3')
+        {
+            ?>
+            <div class="row">
+              <div id="t4_chat_kontak_all"></div>
+              <div id="t4_chat_kasir"></div>
+              
+            </div>
+            <?php 
+
+        }        
+
+
+        if($this->session->userdata('level')=='1')
+        {
+        ?>
+    <!-- Default box -->
       <div class="box">
         <div class="box-header with-border">
           <h3 class="box-title">Sistem Informasi Manajemen Penjualan </h3>
@@ -30,13 +50,6 @@
 
         
 
-            <?php 
-            
-
-
-            if($this->session->userdata('level'))
-            {
-            ?>
         <div class="box-body">
               
 
@@ -123,6 +136,10 @@
       <!-- /.box -->
 
 
+          <?php } ?>
+            
+
+          <?php if($this->session->userdata('level') !=5) {?> 
       <!-- AREA CHART -->
           <div class="box box-primary">
             <div class="box-header with-border">
@@ -146,10 +163,16 @@
             <!-- /.box-body -->
           </div>
           <!-- /.box -->
+        <?php 
+            }
+
+            if($this->session->userdata('level')==5){
+
+                include "isi_pelanggan.php";
+              } 
+            ?> 
 
 
-          <?php } ?>
-            
 
 
               

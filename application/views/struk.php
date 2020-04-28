@@ -52,13 +52,13 @@ font-size:10px;
 </table>
 <hr style="border-top: dotted 1px;" />
 <center>Daftar Belanja</center>
-<table>
+<table class="table" width="100%">
 <tr>
 	<td>ID</td>
 	<td>Barang </td>
 	<td>Satuan </td>
-	<td>Harga </td>
-	<td>Qty </td>
+	<td align=right>Harga </td>
+	<td align=right>Qty </td>
 	<td align=right>Sub Total </td>
 </tr>
 <?php 
@@ -73,7 +73,7 @@ font-size:10px;
 					<td>$key->nama_barang</td>
 					<td>$key->satuan_jual</td>
 					<td align=right> ".rupiah($key->harga_jual)."</td>
-					<td>$key->qty_jual</td>
+					<td align=right>$key->qty_jual</td>
 					<td align=right> ".rupiah($key->sub_total_jual)."</td>
 					
 				</tr>
@@ -106,7 +106,7 @@ font-size:10px;
 		</tr>
 		<tr>
 			<td colspan=5 align=right>Total</td>
-			<td align=right><b>Rp. ".rupiah($total)."</b></td>
+			<td align=right><b>".rupiah($total)."</b></td>
 		</tr>
 		<tr>
 			<td colspan=5 align=right>Bayar</td>
@@ -120,6 +120,9 @@ font-size:10px;
 	";
 ?>
 </table>
+
+<hr style="border-top: dotted 1px;" />
+<?php echo $data[0]->keterangan?>
 <hr style="border-top: dotted 1px;" />
 <center>
 	Selamat Belanja!

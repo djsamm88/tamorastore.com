@@ -30,7 +30,7 @@
                   Nama Barang
                 </div>                
                 <div class="col-sm-8" id="t4_nama_barang">
-                  <input type="text"   class="form-control barang" placeholder="Barang" name="nama_barang">
+                  <input type="text"   class="form-control barang" placeholder="Barang" name="nama_barang" required>
                   <input type="hidden"   class="form-control" name="id_barang" id="id_barang">
                 </div>
                 <div style="clear: both;"></div><br>
@@ -85,14 +85,9 @@
                   Nama Pelanggan
                 </div>                
                 <div class="col-sm-8" >
-                  <select name="id_pelanggan" class="form-control" required="">
-                      <option value="">--- Pilih Pelanggan ---</option>
-                      <?php 
-                        foreach ($this->m_pelanggan->m_data() as $pel) {
-                          echo "<option value='$pel->id_pelanggan'>$pel->nama_pembeli</option>";
-                        }
-                      ?>
-                  </select>
+                  <input  class="form-control id_pelanggan" required>
+                  <input type="hidden"   class="form-control" name="id_pelanggan" id="id_pelanggan">
+                  
                 </div>
                 <div style="clear: both;"></div><br>
 
@@ -164,7 +159,8 @@
               <th>Kondisi</th>                     
               <th>Gudang</th>                     
               <th>Keterangan</th>                     
-              <th>Tgl</th>                     
+              <th>Tgl</th>
+              <th>Action</th>                     
                                   
               
               
@@ -176,7 +172,7 @@
         foreach($all as $x)
         {
           $no++;
-            
+            $btn = $x->kondisi=='rusak'?"<button class='btn btn-xs btn-warning' onclick='kembalikan($x->id_ret)'>Kembalikan ke Suplier</button>":"";
             echo (" 
               
               <tr>
@@ -191,6 +187,7 @@
                 <td>$x->nama_gudang</td>                
                 <td>$x->ket</td>                
                 <td>$x->tgl_trx</td>                
+                <td>$btn</td>                
                 
               </tr>
           ");
@@ -202,9 +199,21 @@
       </tbody>
   </table>
 
+
+<div class="text-left col-sm-6">
 <a href="<?php echo base_url()?>index.php/barang/print_return_barang/" class="btn btn-primary" target="blank">Print Semua</a>
 <a href="<?php echo base_url()?>index.php/barang/print_return_barang/rusak" class="btn btn-danger" target="blank">Print Rusak</a>
 <a href="<?php echo base_url()?>index.php/barang/print_return_barang/baik" class="btn btn-success" target="blank">Print Baik</a>
+</div>
+
+
+
+<div class="text-right col-sm-6">
+<a href="<?php echo base_url()?>index.php/barang/return_barang_xl/" class="btn btn-primary" target="blank">Semua Excel</a>
+<a href="<?php echo base_url()?>index.php/barang/return_barang_xl/rusak" class="btn btn-danger" target="blank">Rusak Excel</a>
+<a href="<?php echo base_url()?>index.php/barang/return_barang_xl/baik" class="btn btn-success" target="blank">Baik Excel</a>
+</div>
+
 
 
 </div>
@@ -237,6 +246,18 @@ foreach($all_barang as $barang)
 ?>
 
 
+<?php
+$p=''; 
+foreach($this->m_pelanggan->m_data() as $pelanggan)
+{
+ $p.='{
+        value:"'.$pelanggan->id_pelanggan.'",
+        label:"'.htmlentities($pelanggan->nama_pembeli).'"
+      },';
+} 
+?>
+
+
 
 $( function() {
     var semuaBarang = [
@@ -262,6 +283,43 @@ $( function() {
 
 });
 
+
+
+$( function() {
+    var semuaPelanggan = [
+      <?php echo $p?>
+    ];
+    $( ".id_pelanggan" ).autocomplete({
+      source: semuaPelanggan,
+                      minLength: 1,
+                select: function(event, ui) {
+                  console.log(ui);
+                 
+
+                $(this).val(ui.item.label);
+                $("#id_pelanggan").val(ui.item.value);                
+                return false;
+                }
+
+
+
+    });
+
+
+});
+
+function kembalikan(id)
+{
+  if(confirm("Anda yakin mengembalikan ke Suplier?"))
+  {
+    $.get("<?php echo base_url()?>index.php/barang/return_barang_ke_suplier/"+id,function(e){
+        eksekusi_controller('<?php echo base_url()?>index.php/barang/return_barang','Return Barang');
+        console.log(e);
+
+    })
+  }
+  return false;
+}
 
 
 $("#jumlah_barang").on("keydown keyup mousedown mouseup select contextmenu drop",function(){

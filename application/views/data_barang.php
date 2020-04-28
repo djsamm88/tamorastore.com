@@ -27,7 +27,12 @@
           </div>
         </div>
         <div class="box-body">
+              <?php 
+              if($this->session->userdata('level')=='1')//hanya admin
+              {?>
               <button class="btn btn-primary" id="tambah_data"  onclick="tambah()">Tambah Data</button> 
+              <?}?>
+<div class="table-responisve">
 <table id="tbl_datanya" class="table  table-striped table-bordered"  cellspacing="0" width="100%">
       <thead>
         <tr>
@@ -40,8 +45,11 @@
               <th>Harga Retail</th>                     
               <th>Harga Lusin</th>                     
               <th>Harga Koli</th>                     
+              <th>Jumlah / Lusin</th>                     
               <th>Jumlah / Koli</th>                     
               <th>Reminder Gudang</th>                     
+              <th>Berat (Kg)</th>                     
+              <th>Gambar</th>                     
               <th>Action</th>                     
               
               
@@ -55,7 +63,11 @@
           $btn = "<button class='btn btn-warning btn-xs' onclick='edit($x->id);return false;'>Edit</button>
                   <button class='btn btn-danger btn-xs' onclick='hapus($x->id);return false;'>Hapus</button>    ";
           $no++;
-            
+          if($this->session->userdata('level')!='1')//hanya admin
+          {
+            $x->harga_pokok=0;
+            $btn="-";
+          }
             echo (" 
               
               <tr>
@@ -67,8 +79,11 @@
                 <td>".rupiah($x->harga_retail)."</td>                
                 <td>".rupiah($x->harga_lusin)."</td>                
                 <td>".rupiah($x->harga_koli)."</td>                
+                <td>".rupiah($x->jum_per_lusin)."</td>     
                 <td>".rupiah($x->jum_per_koli)."</td>     
                 <td>$x->reminder</td>                           
+                <td>$x->berat</td>                           
+                <td><a target='blank' href='".base_url()."uploads/$x->gambar'>$x->gambar</a></td>                           
                 <td>
                   $btn
                 </td>
@@ -81,7 +96,9 @@
         ?>
       </tbody>
   </table>
+</div>
 
+<a href="<?php echo(base_url())?>index.php/barang/data_xl" target="blank" class="btn btn-primary">Excel</a>
 
         </div>
         
@@ -132,6 +149,12 @@
 
 
 
+        <div class="col-sm-4">Jumlah/Lusin</div>
+            <div class="col-sm-8"><input type="text" name="jum_per_lusin" id="jum_per_lusin" required="required" class="form-control nomor" placeholder="jum_per_lusin" ></div>
+            <div style="clear: both;"></div><br>
+        
+
+
         <div class="col-sm-4">Jumlah/Koli</div>
             <div class="col-sm-8"><input type="text" name="jum_per_koli" id="jum_per_koli" required="required" class="form-control nomor" placeholder="jum_per_koli" ></div>
             <div style="clear: both;"></div><br>
@@ -141,6 +164,21 @@
         <div class="col-sm-4">Reminder Gudang</div>
             <div class="col-sm-8"><input type="text" name="reminder" id="reminder" required="required" class="form-control nomor" placeholder="reminder gudang" ></div>
             <div style="clear: both;"></div><br>
+
+
+          <div class="col-sm-4">Gambar</div>
+            <div class="col-sm-8">
+              <input class="form-control" name="gambar" id="gambar" type="file" accept="image/jpeg,image/gif,image/png,application/pdf,image/x-eps">
+            </div>
+            <div style="clear: both;"></div><br>
+
+        <div class="col-sm-4">Berat</div>
+            <div class="col-sm-8"><input type="number" name="berat" id="berat" class="form-control" placeholder="Berat (KG) ex: 0.1" min="0" pattern="[0-9]+([\,|\.][0-9]+)?" step="0.01" ></div>
+            <div style="clear: both;"></div><br>
+
+
+
+        
         
 
             <div id="t4_info_form"></div>
@@ -174,8 +212,12 @@ function edit(id)
     $("#harga_lusin").val(e[0].harga_lusin);
     $("#harga_koli").val(e[0].harga_koli);
     $("#jum_per_koli").val(e[0].jum_per_koli);
+    $("#jum_per_lusin").val(e[0].jum_per_lusin);
+
     $("#harga_pokok").val(e[0].harga_pokok);
     $("#reminder").val(e[0].reminder);
+    $("#berat").val(e[0].berat);
+    $("#gambar").val(e[0].gambar);
     console.log(e[0].qty);
     if(e[0].qty!="0")
     {      
@@ -218,17 +260,28 @@ $("#form_tambah_admin").on("submit",function(){
 
   var ser = $(this).serialize();
 
-  $.post("<?php echo base_url()?>index.php/"+classnya+"/simpan_form",ser,function(x){
-    console.log(x);
-    
-      $("#t4_info_form").html("<div class='alert alert-success'>Berhasil.</div>").fadeIn().delay(3000).fadeOut();
+      $.ajax({
+            url: "<?php echo base_url()?>index.php/"+classnya+"/simpan_form",
+            type: "POST",
+            contentType: false,
+            processData:false,
+            data:  new FormData(this),
+            beforeSend: function(){
+                //alert("sedang uploading...");
+            },
+            success: function(e){
+                console.log(e);
+                $("#t4_info_form").html("<div class='alert alert-success'>Berhasil.</div>").fadeIn().delay(3000).fadeOut();
+                  setTimeout(function(){
+                    $("#myModal").modal('hide');
+                  },3000);
 
-      setTimeout(function(){
-        $("#myModal").modal('hide');
-      },3000);
-    
-  })
-
+                
+            },
+            error: function(er){
+                $("#t4_info_form").html("<div class='alert alert-warning'>Ada masalah! "+er+"</div>");
+            }           
+       });
   return false;
 })
 

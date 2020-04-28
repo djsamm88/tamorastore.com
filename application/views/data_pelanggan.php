@@ -27,6 +27,8 @@
         </div>
         <div class="box-body">
               <button class="btn btn-primary" id="tambah_data"  onclick="tambah_admin()">Tambah Data</button> 
+
+<div class="table-responsive">
 <table id="tbl_newsnya" class="table  table-striped table-bordered"  cellspacing="0" width="100%">
       <thead>
         <tr>
@@ -35,10 +37,12 @@
                <th width="100px">id_pelanggan</th>
                 <th>nama_pembeli</th>
                 <th>email_pembeli</th>
+                <th>password</th>
                 <th>hp_pembeli</th>
                 <th>tgl_daftar</th>
                 <th>tgl_trx_terakhir</th>
                 <th>saldo</th>
+                <th>Status</th>
               <th>Action</th>
               
         </tr>
@@ -48,9 +52,13 @@
         $no = 0;
         foreach($all as $x)
         {
-          $btn = "<button class='btn btn-warning btn-xs' onclick='edit_admin($x->id_pelanggan);return false;'>Edit</button>
-                  <button class='btn btn-danger btn-xs' onclick='hapus_admin($x->id_pelanggan);return false;'>Hapus</button>    ";
+          $btn = "<button class='btn btn-warning btn-xs btn-block' onclick='edit_admin($x->id_pelanggan);return false;'>Edit</button>
+                  <button class='btn btn-danger btn-xs btn-block' onclick='hapus_admin($x->id_pelanggan);return false;'>Hapus</button>    ";
+
+          $btnStatus = $x->status=="biasa"?"<button class='btn btn-xs btn-block btn-primary' onclick='jadikan_member($x->id_pelanggan)'>Jadikan member</button>":"";
           $no++;
+
+          $x->status = $x->status=="member"?"<span class='label label-success badge'>$x->status</span>":$x->status;
 
             echo (" 
               
@@ -59,10 +67,14 @@
                 <td>$x->id_pelanggan</td>
                 <td>$x->nama_pembeli</td>
                 <td>$x->email_pembeli</td>
+                <td>$x->password</td>
                 <td>$x->hp_pembeli</td>
                 <td>$x->tgl_daftar</td>
                 <td>$x->tgl_trx_terakhir</td>
                 <td>".rupiah($x->saldo)."</td>
+                <td>$x->status <br> $btnStatus</td>
+                
+
                 <td>
                   $btn
                 </td>
@@ -75,6 +87,7 @@
         ?>
       </tbody>
   </table>
+</div>
 
 
         </div>
@@ -110,21 +123,28 @@
             <br>
 
 
-            <div class="col-sm-4 judul">email_pembeli</div>
-            <div class="col-sm-8">
-              <input class="form-control" name="email_pembeli" id="email_pembeli" type="email">
-            </div>
-            <div style="clear:both"></div>
-            <br>
-
-
             <div class="col-sm-4 judul">hp_pembeli</div>
             <div class="col-sm-8">
-              <input class="form-control" name="hp_pembeli" id="hp_pembeli" required type="number">
+              <input class="form-control" name="hp_pembeli" id="hp_pembeli" required>
             </div>
             <div style="clear:both"></div>
             <br>
 
+
+            <div class="col-sm-4 judul">email_pembeli</div>
+            <div class="col-sm-8">
+              <input class="form-control" name="email_pembeli" id="email_pembeli" type="email" required>
+            </div>
+            <div style="clear:both"></div>
+            <br>
+
+
+            <div class="col-sm-4 judul">password</div>
+            <div class="col-sm-8">
+              <input class="form-control" name="password" id="password" type="text" required>
+            </div>
+            <div style="clear:both"></div>
+            <br>
 
 
 
@@ -177,10 +197,38 @@ function edit_admin(id_pelanggan)
     $("#id_pelanggan").val(e[0].id_pelanggan);
     $("#nama_pembeli").val(e[0].nama_pembeli);
     $("#email_pembeli").val(e[0].email_pembeli);
+    $("#password").val(e[0].password);
     $("#hp_pembeli").val(e[0].hp_pembeli);
+
     
   })
   $("#myModal").modal('show');
+}
+
+function jadikan_member(id_pelanggan)
+{
+  if(confirm("Anda yakin menjadikan member?"))
+  {
+    $.get("<?php echo base_url()?>index.php/pelanggan/by_id/"+id_pelanggan,function(e){
+      if(e[0].email_pembeli=="" || e[0].password=="")
+      {
+        alert("Untuk member, lengkapi dulu email dan password");
+        $("#id_pelanggan").val(e[0].id_pelanggan);
+        $("#nama_pembeli").val(e[0].nama_pembeli);
+        $("#email_pembeli").val(e[0].email_pembeli);
+        $("#password").val(e[0].password);
+        $("#hp_pembeli").val(e[0].hp_pembeli);
+        $("#myModal").modal('show');
+        return false;
+      }
+
+      $.get("<?php echo base_url()?>index.php/pelanggan/jadikan_member/"+id_pelanggan,function(x){
+
+        alert("Berhasil");
+        eksekusi_controller('<?php echo base_url()?>index.php/pelanggan/data','Data pelanggan');
+      })
+    })
+  }
 }
 
 function tambah_admin()
@@ -212,7 +260,11 @@ $("#form_pelanggan").on("submit",function(){
 
   $.post("<?php echo base_url()?>index.php/pelanggan/simpan",ser,function(x){
     console.log(x);
-    
+      if(x=="2")
+      {
+        $("#t4_info_form").html("<div class='alert alert-warning'>email sudah terdaftar, gunakan email lain.</div>").fadeIn();;  
+        return false; 
+      }    
       $("#t4_info_form").html("<div class='alert alert-success'>Berhasil.</div>").fadeIn().delay(3000).fadeOut();
 
       setTimeout(function(){
