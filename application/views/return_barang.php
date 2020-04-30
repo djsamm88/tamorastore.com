@@ -76,6 +76,7 @@
                   Total Uang Kembali
                 </div>
                 <div class="col-sm-8" >
+                  <input type="hidden" id="uang_kembali_hide">
                   <input type="text" name="uang_kembali" id="uang_kembali" class="form-control nomor" placeholder="Uang kembali">
                 </div>
                 <div style="clear: both;"></div><br>
@@ -172,7 +173,9 @@
         foreach($all as $x)
         {
           $no++;
-            $btn = $x->kondisi=='rusak'?"<button class='btn btn-xs btn-warning' onclick='kembalikan($x->id_ret)'>Kembalikan ke Suplier</button>":"";
+            $btn = $x->kondisi=='rusak'?"<button class='btn  btn-block btn-xs btn-warning' onclick='kembalikan($x->id_ret)'>Kembalikan ke Suplier</button>":"";
+
+            $btn .= "<button class='btn btn-xs btn-primary btn-block' onclick='cetak($x->id_ret)'>Cetak</button>";
             echo (" 
               
               <tr>
@@ -273,6 +276,7 @@ $( function() {
                 $(this).val(ui.item.label);
                 $("#id_barang").val(ui.item.value);
                 $("#uang_kembali").val(ui.item.harga_retail);
+                $("#uang_kembali_hide").val(ui.item.harga_retail);
                 return false;
                 }
 
@@ -320,31 +324,44 @@ function kembalikan(id)
   }
   return false;
 }
+function buang_titik(mystring)
+{
+  return (mystring.replace(/\./g,''));
+}
 
 
 $("#jumlah_barang").on("keydown keyup mousedown mouseup select contextmenu drop",function(){
     var jum   = parseInt(buang_titik($(this).val()));
-    var uang  = parseInt(buang_titik($("#uang_kembali").val()));
+    var uang  = parseInt(buang_titik($("#uang_kembali_hide").val()));
 
     console.log(jum);
     console.log(uang);
     var hasil_kali = jum*uang;
 
     console.log(hasil_kali);
-    //$("#uang_kembali").val(hasil_kali);
+    if(isNaN(hasil_kali))
+    {
+      hasil_kali=0;
+    }
+    $("#uang_kembali").val(hasil_kali);
 })
 
 $("#form_return").on("submit",function(){
   console.log($(this).serialize());
   if(confirm("Anda yakin?"))
   {
-    $.post("<?php echo base_url()?>index.php/barang/go_return_barang",$(this).serialize(),function(){
+    $.post("<?php echo base_url()?>index.php/barang/go_return_barang",$(this).serialize(),function(e){
+      cetak(e);
       eksekusi_controller('<?php echo base_url()?>index.php/barang/return_barang','Return Barang');
     })
   }
   return false;
 })
 
+function cetak(id_ret)
+{
+  window.open("<?php echo base_url()?>index.php/barang/cetak_return_by_id/"+id_ret); 
+}
 
 $(document).ready(function(){
 

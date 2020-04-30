@@ -21,6 +21,7 @@ class Chat extends CI_Controller {
 
 	public function index()	
 	{
+		$data['session'] = $this->session->userdata();
 		$data['kpd_id'] 	= $this->input->get('kpd_id');
 		$data['kpd_nama'] 	= $this->input->get('kpd_nama');
 		$id = 'kasir';	

@@ -78,7 +78,7 @@
         <tr>
           <td colspan="5" align="right"><b>Saldo</b></td>
           <td  align="right" >
-            <input id="t4_saldo" type="text" name="saldo" class="form-control nomor" value="0" style="text-align:right;" readonly>
+            <input id="t4_saldo" type="text" name="saldo" class="form-control nomor" value="<?php echo $pelanggan->saldo?>" style="text-align:right;" readonly>
           </td>
           <td></td>
         </tr>
@@ -126,7 +126,7 @@ $('.datepicker').datepicker({
   autoclose: true,
   format: 'yyyy-mm-dd <?php echo date('H:i:s')?>' 
 })
-notif(); 
+notif_member(); 
 
 total();
 
@@ -226,7 +226,8 @@ $( function() {
                           option+
                          "</select>";
 
-        var jum_batas = "<input id='jum_per_koli' type='hidden' value='"+ui.item.jum_per_koli+"'>"+
+        var jum_batas = "<input id='stok' type='hidden' value='"+stok+"'>"+
+                        "<input id='jum_per_koli' type='hidden' value='"+ui.item.jum_per_koli+"'>"+
                         "<input id='jum_per_lusin' type='hidden' value='"+ui.item.jum_per_lusin+"'>"+
                         "<input id='id_barang' name='id_barang["+ii+"]' type='hidden' value='"+ui.item.value+"'>";
 
@@ -311,8 +312,10 @@ $("#tbl_datanya").on("keydown keyup mousedown mouseup select contextmenu drop","
   var dibeli        = parseInt($(this).val());
   var jum_per_koli  = parseInt($(this).parent().parent().find("#jum_per_koli").val());
   var jum_per_lusin = parseInt($(this).parent().parent().find("#jum_per_lusin").val());
+  var stok = parseInt($(this).parent().parent().find("#stok").val());
 
   var pilihSatuan   = $(this).parent().parent().find("#pilihSatuan").val();
+
 
 
   if(pilihSatuan=='koli' && dibeli<jum_per_koli){
@@ -326,6 +329,13 @@ $("#tbl_datanya").on("keydown keyup mousedown mouseup select contextmenu drop","
     alert("Minimal beli Lusin barang ini = "+jum_per_lusin);
     $(this).val(jum_per_lusin);
   }
+
+  if(stok<dibeli)
+  {
+    alert("Maaf, Stok barang tinggal "+stok);
+    $(this).val(stok);
+  }
+
 
   sub_total($(this));  
   
@@ -395,7 +405,7 @@ $("#penjualan_barang").on("submit",function(){
     $.post("<?php echo base_url()?>index.php/"+classnya+"/go_pesan",$(this).serialize(),function(x){
       console.log(x);
       eksekusi_controller('<?php echo base_url()?>index.php/pelanggan/pesanan_member','Pesanan Member');
-        
+      notif_member();
     })
   
   }

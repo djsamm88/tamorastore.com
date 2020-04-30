@@ -138,7 +138,7 @@ $("#go_trx_jurnal").on("submit",function(){
       return false;
     }
 
-    eksekusi_controller('<?php echo base_url()?>index.php/barang/lap_penjualan/?mulai='+mulai+'&selesai='+selesai,'Laporan Penjualan');
+    eksekusi_controller('<?php echo base_url()?>index.php/pelanggan/lap_penjualan_pelanggan/?mulai='+mulai+'&selesai='+selesai,'Laporan Penjualan');
   return false;
 })
 
@@ -146,7 +146,7 @@ $("#go_trx_jurnal").on("submit",function(){
 
 $("#download_pdf").on("click",function(){
   var ser = $("#go_trx_jurnal").serialize();
-  var url="<?php echo base_url()?>index.php/barang/lap_penjualan_excel/?"+ser;
+  var url="<?php echo base_url()?>index.php/pelanggan/lap_penjualan_pelanggan_excel/?"+ser;
   window.open(url);
 
   return false;

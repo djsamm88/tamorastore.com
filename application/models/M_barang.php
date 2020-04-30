@@ -84,6 +84,36 @@ if (!defined('BASEPATH'))exit('No direct script access allowed');
 	}
 
 
+	public function m_data_barang_member()
+	{
+		$q = $this->db->query("SELECT a.*,IFNULL(b.qty,0) AS qty,IFNULL(c.qty,0) AS masuk  
+								FROM tbl_barang a
+								LEFT JOIN(
+										SELECT 
+											a.id_barang, 
+											IFNULL(a.qty,0)-IFNULL(b.qty,0) AS qty
+											 FROM 
+											(SELECT id_barang,SUM(jumlah) AS qty FROM `tbl_barang_transaksi` WHERE jenis='masuk' GROUP BY id_barang
+											)a 
+											LEFT JOIN 
+											(SELECT id_barang,SUM(jumlah) AS qty FROM `tbl_barang_transaksi` WHERE jenis='keluar' GROUP BY id_barang
+											)b 
+											ON a.id_barang=b.id_barang 
+								)b
+								ON a.id =b.id_barang								
+								LEFT JOIN (
+									SELECT id_barang,SUM(qty) AS qty FROM `tbl_barang_masuk_tanpa_harga` WHERE status='belum' GROUP BY id_barang
+								)c
+								ON a.id=c.id_barang
+								WHERE IFNULL(b.qty,0)>0
+								ORDER BY b.qty DESC
+					");
+		return $q->result();
+	}
+
+	
+
+
 	public function m_data_gudang($id_gudang)
 	{
 		$q = $this->db->query("SELECT a.*,IFNULL(b.qty,0) AS qty,b.id_gudang,c.nama_gudang,a.reminder
@@ -386,7 +416,27 @@ if (!defined('BASEPATH'))exit('No direct script access allowed');
 		return $get->result();
 	}
 
-	public function m_lap_penjualan($id_admin='')
+
+	public function m_detail_penjualan_struk($grup_penjualan)
+	{
+		$q = "
+				SELECT 
+					a.*,
+					b.*,
+					c.nama_admin
+				FROM tbl_barang_transaksi a 
+				LEFT JOIN tbl_barang b 
+				ON a.id_barang=b.id 
+				LEFT JOIN tbl_admin c 
+				ON a.id_admin=c.id_admin				
+				WHERE a.grup_penjualan='$grup_penjualan'
+			";
+
+		$get = $this->db->query($q);
+		return $get->result();
+	}
+
+	public function m_lap_penjualan($mulai,$selesai,$id_admin='')
 	{	
 		$where="";
 		if($id_admin!='')
@@ -400,7 +450,7 @@ if (!defined('BASEPATH'))exit('No direct script access allowed');
 				a.grup_penjualan,
 				SUM(a.sub_total_jual) AS total, 
 				a.diskon,
-				a.tgl_transaksi,
+				a.saldo,				
 				a.nama_pembeli,
 				a.hp_pembeli,
 				a.nama_packing,
@@ -413,15 +463,17 @@ if (!defined('BASEPATH'))exit('No direct script access allowed');
 				b.email_admin 
 			FROM tbl_barang_transaksi a
 			LEFT JOIN tbl_admin b ON a.id_admin=b.id_admin
-			WHERE a.jenis='keluar' AND (a.harga_beli <> 0 AND a.harga_jual <> 0) $where
+			WHERE a.jenis='keluar' AND (a.harga_beli <> 0 AND a.harga_jual <> 0) $where 
+				AND a.tgl_transaksi BETWEEN '$mulai' AND '$selesai'
 			GROUP BY grup_penjualan
 			ORDER BY tgl_transaksi DESC
 			");
+
 		return $q->result();
 	}
 
 
-	public function m_lap_penjualan_member($id_pelanggan)
+	public function m_lap_penjualan_member($mulai,$selesai,$id_pelanggan)
 	{	
 		
 		$where=" AND a.id_pelanggan='$id_pelanggan'";
@@ -431,7 +483,7 @@ if (!defined('BASEPATH'))exit('No direct script access allowed');
 				a.grup_penjualan,
 				SUM(a.sub_total_jual) AS total, 
 				a.diskon,
-				a.tgl_transaksi,
+				a.saldo,				
 				a.nama_pembeli,
 				a.hp_pembeli,
 				a.nama_packing,
@@ -445,6 +497,7 @@ if (!defined('BASEPATH'))exit('No direct script access allowed');
 			FROM tbl_barang_transaksi a
 			LEFT JOIN tbl_admin b ON a.id_admin=b.id_admin
 			WHERE a.jenis='keluar' AND (a.harga_beli <> 0 AND a.harga_jual <> 0) $where
+			 	 AND a.tgl_transaksi BETWEEN '$mulai' AND '$selesai'
 			GROUP BY grup_penjualan
 			ORDER BY tgl_transaksi DESC
 			");
@@ -465,6 +518,8 @@ public function m_pesanan_member($id_pelanggan='')
 			a.grup_penjualan,
 			SUM(a.sub_total_jual) AS total, 
 			a.diskon,
+			a.saldo,
+			a.bukti_transfer,
 			a.tgl_transaksi,
 			a.nama_pembeli,
 			a.hp_pembeli,

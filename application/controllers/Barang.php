@@ -401,7 +401,7 @@ class Barang extends CI_Controller {
 
 	public function struk_penjualan($group_penjualan)
 	{
-		$data['data'] = $this->m_barang->m_detail_penjualan($group_penjualan);		
+		$data['data'] = $this->m_barang->m_detail_penjualan_struk($group_penjualan);		
 		$this->load->view('struk',$data);
 	}
 
@@ -493,6 +493,51 @@ class Barang extends CI_Controller {
 		$this->load->view('return_barang',$data);
 	}
 
+	public function cetak_return_by_id($id)
+	{
+		$q = $this->db->query("SELECT a.*,a.id AS id_ret ,b.*,c.*,d.nama_gudang
+								FROM tbl_barang_return a
+								LEFT JOIN tbl_barang b ON a.id_barang=b.id
+								LEFT JOIN tbl_pelanggan c ON a.id_pelanggan=c.id_pelanggan
+								LEFT JOIN tbl_gudang d ON a.id_gudang=d.id_gudang
+								WHERE a.id='$id' 
+								ORDER BY a.id DESC
+					");
+
+		$data['all'] = $q->result();
+
+		//var_dump($staff_arr);
+		$filename = "return_barang_".$this->router->fetch_class()."_".date('d_m_y_h_i_s');
+		
+		// As PDF creation takes a bit of memory, we're saving the created file in /downloads/reports/
+		$pdfFilePath = FCPATH."downloads/$filename.pdf";
+		
+		 //$html = $this->load->view('slip_pembayaran.php',$data);
+    
+    	//echo json_encode($data);
+    	//$this->load->view('template/part/laporan_pdf.php',$data);
+    	
+    	
+		if (file_exists($pdfFilePath) == FALSE)
+		{
+			//ini_set('memory_limit','512M'); // boost the memory limit if it's low <img class="emoji" draggable="false" alt="" src="https://s.w.org/images/core/emoji/72x72/1f609.png">
+        	ini_set('memory_limit', '2048M');
+			//$html = $this->load->view('laporan_mpdf/pdf_report', $data, true); // render the view into HTML
+			$html = $this->load->view('print_return_barang_by_id.php',$data,true);
+			
+			$this->load->library('pdf_setengah'); 
+			$pdf = $this->pdf_setengah->load();
+			//$this->load->library('pdf');
+			//$pdf = $this->pdf->load();
+
+			$pdf->SetFooter($_SERVER['HTTP_HOST'].'|{PAGENO}|'.date("YmdHis")."_".$this->session->userdata('id_admin')); // Add a footer for good measure <img class="emoji" draggable="false" alt="" src="https://s.w.org/images/core/emoji/72x72/1f609.png">
+			$pdf->WriteHTML($html); // write the HTML into the PDF
+			$pdf->Output($pdfFilePath, 'F'); // save to file because we can
+		}
+		 
+		redirect(base_url()."downloads/$filename.pdf","refresh");
+	}
+
 	public function return_barang_ke_suplier($id)
 	{		
 		$this->db->query("UPDATE tbl_barang_return SET status='suplier' WHERE id='$id'");
@@ -569,7 +614,7 @@ class Barang extends CI_Controller {
 
 		$this->db->set($data);
 		$this->db->insert('tbl_barang_return');
-
+		$id_ret = $this->db->insert_id();
 
 
 		/*********** insert ke transaksi **************/	
@@ -603,6 +648,8 @@ class Barang extends CI_Controller {
 							");
 		}
 		/********** jika kondisi=baik masuk ke barang ***************/
+
+		echo $id_ret;
 	}
 
 
@@ -660,6 +707,9 @@ class Barang extends CI_Controller {
 
 	public function lap_penjualan()
 	{
+		$mulai = $this->input->get('mulai');
+		$selesai = $this->input->get('selesai');
+
 		$id_admin 	= $this->session->userdata('id_admin');
 		$level 		= $this->session->userdata('level');
 
@@ -668,9 +718,40 @@ class Barang extends CI_Controller {
 			$id_admin="";
 		}
 
-		$data['all'] = $this->m_barang->m_lap_penjualan($id_admin);	
+		$data['mulai'] = $mulai;
+		$data['selesai'] = $selesai;
+
+		$data['all'] = $this->m_barang->m_lap_penjualan($mulai,$selesai,$id_admin);	
 		$this->load->view('lap_penjualan',$data);
 	}
+
+	public function lap_penjualan_excel()
+	{
+		$mulai = $this->input->get('mulai');
+		$selesai = $this->input->get('selesai');
+
+		$file = "laporan_penjualan-$mulai-$selesai.xls";
+		header("Content-type: application/octet-stream");
+		header("Content-Disposition: attachment; filename=$file");
+		header("Pragma: no-cache");
+		header("Expires: 0");	
+
+		$id_admin 	= $this->session->userdata('id_admin');
+		$level 		= $this->session->userdata('level');
+
+		if($level=='1')
+		{
+			$id_admin="";
+		}
+
+		$data['mulai'] = $mulai;
+		$data['selesai'] = $selesai;
+
+		$data['all'] = $this->m_barang->m_lap_penjualan($mulai,$selesai,$id_admin);	
+		$this->load->view('lap_penjualan_xl',$data);
+	}
+
+	
 
 
 

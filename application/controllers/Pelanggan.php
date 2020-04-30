@@ -31,9 +31,23 @@ class Pelanggan extends CI_Controller {
 		
 		$data['all'] = $this->m_barang->m_pesanan_member($this->session->userdata('id_admin'));	
 		$this->load->view('data_pesanan',$data);
+
 	}
 
+	public function master_barang()
+	{
+		
+		$data['all'] = $this->m_barang->m_data_barang_member();	
+		$this->load->view('data_barang_member',$data);
+	}
 
+	public function go_upload_bukti()
+	{
+		$bukti_transfer = upload_file('gambar');
+		$grup_penjualan = $this->input->post('grup_penjualan');
+		$this->db->query("UPDATE tbl_barang_transaksi SET bukti_transfer='$bukti_transfer' WHERE grup_penjualan='$grup_penjualan'");
+		echo "OK";
+	}
 
 	public function go_pesan()
 	{
@@ -124,9 +138,36 @@ class Pelanggan extends CI_Controller {
 	public function lap_penjualan_pelanggan()
 	{
 		$id_pelanggan = $this->session->userdata('id_admin');
-		$data['all'] = $this->m_barang->m_lap_penjualan_member($id_pelanggan);	
-		$this->load->view('lap_penjualan',$data);
+		$mulai = $this->input->get('mulai');
+		$selesai = $this->input->get('selesai');
+		$data['mulai'] = $mulai;
+		$data['selesai'] = $selesai;
+		$data['all'] = $this->m_barang->m_lap_penjualan_member($mulai,$selesai,$id_pelanggan);	
+		$this->load->view('lap_penjualan_member',$data);
+	
 	}
+
+
+	public function lap_penjualan_pelanggan_excel()
+	{
+		$mulai = $this->input->get('mulai');
+		$selesai = $this->input->get('selesai');
+
+		$file = "laporan_penjualan-$mulai-$selesai.xls";
+		header("Content-type: application/octet-stream");
+		header("Content-Disposition: attachment; filename=$file");
+		header("Pragma: no-cache");
+		header("Expires: 0");	
+
+		$id_pelanggan = $this->session->userdata('id_admin');
+
+		$data['mulai'] = $mulai;
+		$data['selesai'] = $selesai;
+
+		$data['all'] = $this->m_barang->m_lap_penjualan_member($mulai,$selesai,$id_pelanggan);	
+		$this->load->view('lap_penjualan_xl',$data);
+	}
+
 
 	public function data()
 	{

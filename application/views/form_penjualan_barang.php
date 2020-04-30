@@ -1,10 +1,12 @@
 <?php
 $all_template = ""; 
+$keterangan = ""; 
 $saldo = 0;
 if(isset($group_penjualan))
 {
   $data = $this->m_barang->m_detail_penjualan($group_penjualan);    
   $saldo = rupiah($data[0]->saldo);
+  $keterangan = $data[0]->keterangan;
   $z=0;
   foreach ($data as $pend) {
     $sel_retail = $pend->satuan_jual=='retail'?'selected':'';
@@ -210,7 +212,7 @@ if(isset($group_penjualan))
       </tfoot>
   </table>
 </div>
-  <textarea class="form-control" name="keterangan" placeholder="keterangan"></textarea><br>
+  <textarea class="form-control" name="keterangan" placeholder="keterangan"><?php echo $keterangan?></textarea><br>
 <div class="col-sm-6" style="text-align: left;">
     <input type="button" value="Pending" class="btn btn-warning" id="simpan_pending"> 
 </div>

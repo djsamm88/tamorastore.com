@@ -35,9 +35,11 @@
               <th>No</th>                                          
               <th>Tanggal</th>                                    
               <th>Kode Trx.</th>                                              
+              <th>Saldo</th>                                                   
               <th>Sub Total</th>                                                   
               <th>Total</th>                     
               <th>Status</th>                     
+              <th>Bukti Transfer</th>                     
               
               
         </tr>
@@ -48,6 +50,10 @@
         foreach($all as $x)
         {
           $no++;
+
+      $url_bukti  = "<a href='".base_url()."uploads/$x->bukti_transfer' target='blank'>$x->bukti_transfer</a>";
+      $btn_upload = "<a href='#' class='btn btn-xs btn-block btn-warning' onclick='upload_bukti($x->grup_penjualan);return false;'>Upload Bukti</a>";
+      $bukti = $x->bukti_transfer==""?$btn_upload:$url_bukti;
             
             echo (" 
               
@@ -55,12 +61,17 @@
                 <td>$no</td>                                
                 <td>".($x->tgl_transaksi)."</td>                
                 <td>$x->grup_penjualan</td>                                
+                <td align=right>".rupiah($x->saldo)."</td>                                
                 <td align=right>".rupiah($x->total)."</td>                                
-                <td align=right>".rupiah($x->total-$x->diskon+($x->harga_ekspedisi+$x->transport_ke_ekspedisi))."</td>                
+                <td align=right>".rupiah($x->total-$x->saldo-$x->diskon+($x->harga_ekspedisi+$x->transport_ke_ekspedisi))."</td>                
                 <td>
                  <span class='label label-warning'>Menunggu</span>
                  <a href='#' onclick='lihat_detail($x->grup_penjualan);return false;'>Lihat detail</a>
-                </td>                                
+                </td>
+                <td>
+                 $bukti
+                 
+                </td>                                 
               </tr>
           ");
           
@@ -112,9 +123,100 @@
 </div>
 
 
+
+
+
+<!-- Modal -->
+<div id="myModalUploadBukti" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Upload Bukti Transfer</h4>
+      </div>
+      <div class="modal-body">
+          <form id="form_upload_bukti">
+            <input type="hidden" name="grup_penjualan" id="grup_penjualan" class="form-control" readonly="readonly">            
+
+          <div class="col-sm-4">Gambar</div>
+            <div class="col-sm-8">
+              <input class="form-control" name="gambar" id="gambar" type="file" accept="image/jpeg,image/gif,image/png,application/pdf,image/x-eps" onchange="readURL(this)">
+              <span id="t4_gbr_onload"></span>
+            </div>
+            <div style="clear: both;"></div><br>
+
+            <div id="t4_info_form_bukti"></div>
+            <button type="submit" class="btn btn-primary"> Upload </button>
+          </form>
+
+          <div style="clear: both;"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
 <script>
 console.log("<?php echo $this->router->fetch_class();?>");
 var classnya = "<?php echo $this->router->fetch_class();?>";
+
+
+function upload_bukti(grup_penjualan)
+{
+
+  $("#grup_penjualan").val(grup_penjualan);
+  $("#myModalUploadBukti").modal('show');
+  return false;
+}
+
+
+function readURL(input) {
+  if (input.files && input.files[0]) {
+      var reader = new FileReader();
+
+      reader.onload = function (e) {      
+        $("#t4_gbr_onload").html("<img src='"+e.target.result+"' style='width:200px;' class='img img-responsive'>");          
+      };
+
+      reader.readAsDataURL(input.files[0]);
+  }
+}
+
+
+$("#form_upload_bukti").on("submit",function(){
+  var ser = $(this).serialize();
+
+      $.ajax({
+            url: "<?php echo base_url()?>index.php/"+classnya+"/go_upload_bukti",
+            type: "POST",
+            contentType: false,
+            processData:false,
+            data:  new FormData(this),
+            beforeSend: function(){
+                //alert("sedang uploading...");
+            },
+            success: function(e){
+                console.log(e);
+                $("#t4_info_form_bukti").html("<div class='alert alert-success'>Berhasil.</div>").fadeIn().delay(3000).fadeOut();
+                  setTimeout(function(){
+                    $("#myModal").modal('hide');
+                  },3000);
+
+                
+            },
+            error: function(er){
+                $("#t4_info_form").html("<div class='alert alert-warning'>Ada masalah! "+er+"</div>");
+            }           
+       });
+
+  return false;  
+})
 
 
 function lihat_detail(grup_penjualan)
@@ -163,5 +265,11 @@ $("#judul2").html("DataTable "+document.title);
 function formatRupiah(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 }
+
+
+$("#myModalUploadBukti").on("hidden.bs.modal", function () {
+  eksekusi_controller('<?php echo base_url()?>index.php/'+classnya+'/pesanan_member',document.title);
+});
+
 
 </script>

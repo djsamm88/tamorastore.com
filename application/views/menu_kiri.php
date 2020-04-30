@@ -135,6 +135,12 @@
 
 
 
+           <li>
+            <a href="#" onclick="eksekusi_controller('<?php echo base_url()?>index.php/barang/lap_penjualan/?mulai=<?php echo date( 'Y-m-d', strtotime(' -1 day' ))?>&selesai=<?php echo date('Y-m-d',strtotime('+1 days'));?>','Transaksi Penjualan');return false;">
+              <i class="fa fa-link"></i> <span>Lap.Penjualan</span>
+            </a>
+          </li>
+
              <li>
               <a href="#" onclick="eksekusi_controller('<?php echo base_url()?>index.php/barang/lap_pending','Transaksi Pending');return false;">
                 <i class="fa fa-link"></i> <span>Pending  <span class="label label-danger pull-right badge_pending"></span></span>
@@ -417,6 +423,7 @@
 
 
         <?php 
+          //kasir
           if($this->session->userdata('level')=='3')
           {?>
 
@@ -425,6 +432,13 @@
         <li>
           <a href="#" onclick="eksekusi_controller('<?php echo base_url()?>index.php/barang/form_penjualan',' Kasir');return false;">
             <i class="fa fa-shopping-cart"></i> <span>Kasir</span>
+          </a>
+        </li>
+
+
+         <li>
+          <a href="#" onclick="eksekusi_controller('<?php echo base_url()?>index.php/barang/pesanan_member','Pesanan Member');return false;">
+            <i class="fa fa-link"></i> <span>Pesanan  Member<span class="label label-danger pull-right badge_pesanan_member"></span></span>
           </a>
         </li>
 
@@ -450,7 +464,7 @@
 
 
          <li>
-          <a href="#" onclick="eksekusi_controller('<?php echo base_url()?>index.php/barang/lap_penjualan','Transaksi Penjualan');return false;">
+          <a href="#" onclick="eksekusi_controller('<?php echo base_url()?>index.php/barang/lap_penjualan/?mulai=<?php echo date( 'Y-m-d', strtotime(' -1 day' ))?>&selesai=<?php echo date('Y-m-d',strtotime('+1 days'));?>','Transaksi Penjualan');return false;">
             <i class="fa fa-link"></i> <span>Lap.Penjualan</span>
           </a>
         </li>
@@ -465,12 +479,7 @@
           </a>
 
           <ul class="treeview-menu">
-             <li>
-              <a href="#" onclick="eksekusi_controller('<?php echo base_url()?>index.php/Pelanggan/data','Master Pelanggan');return false;">
-                <i class="fa fa-link"></i> <span>Data</span>
-              </a>
-            </li>
-
+             
             <li>
               <a href="#" onclick="eksekusi_controller('<?php echo base_url()?>index.php/Pelanggan/transaksi','Utang/Piutang');return false;">
                 <i class="fa fa-link"></i> <span>Transaksi</span>
@@ -555,11 +564,18 @@
 
 
         <li>
-          <a href="#" onclick="eksekusi_controller('<?php echo base_url()?>index.php/pelanggan/lap_penjualan_pelanggan',' History Belanja');return false;">
+          <a href="#" onclick="eksekusi_controller('<?php echo base_url()?>index.php/pelanggan/lap_penjualan_pelanggan/?mulai=<?php echo date( 'Y-m-d', strtotime(' -1 day' ))?>&selesai=<?php echo date('Y-m-d',strtotime('+1 days'));?>',' History Belanja');return false;">
             <i class="fa fa-link"></i> <span>History Belanja</span>
           </a>
         </li>
 
+
+
+         <li>
+          <a href="#" onclick="eksekusi_controller('<?php echo base_url()?>index.php/pelanggan/master_barang','Master Barang');return false;">
+            <i class="fa fa-link"></i> <span>Master Barang</span>
+          </a>
+        </li>
 
 
         <?php }?>

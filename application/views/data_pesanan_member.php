@@ -38,10 +38,9 @@
               <th>Kode Trx.</th>                     
               <th>Kepada</th>                     
               <th>Sub Total</th>                     
-              <th>Diskon</th>                     
-              <th>Ekspedisi</th>                     
-              <th>Transport Ke Ekspedisi</th>                     
+              <th>Saldo</th>                                   
               <th>Total</th>                     
+              <th>Bukti Transfer</th>                     
               <th>Action</th>                     
               
               
@@ -53,7 +52,7 @@
         foreach($all as $x)
         {
           $no++;
-            
+            $url_bukti  = "<a href='".base_url()."uploads/$x->bukti_transfer' target='blank'>$x->bukti_transfer</a>";
             echo (" 
               
               <tr>
@@ -65,10 +64,9 @@
                 <td>$x->grup_penjualan</td>                
                 <td>$x->nama_pembeli -[ $x->id_pelanggan ]</td>                
                 <td align=right>".rupiah($x->total)."</td>                
-                <td align=right>".rupiah($x->diskon)."</td>                
-                <td align=right>".rupiah($x->harga_ekspedisi)."</td>                
-                <td align=right>".rupiah($x->transport_ke_ekspedisi)."</td>                
-                <td align=right>".rupiah($x->total-$x->diskon+($x->harga_ekspedisi+$x->transport_ke_ekspedisi))."</td>                
+                <td align=right>".rupiah($x->saldo)."</td>                                
+                <td align=right>".rupiah($x->total-$x->saldo-$x->diskon+($x->harga_ekspedisi+$x->transport_ke_ekspedisi))."</td>                
+                <td>$url_bukti</td>
                 <td>
                   <button class='btn btn-primary btn-block btn-xs' onclick='proses_pending($x->grup_penjualan)'>Proses</button>
 

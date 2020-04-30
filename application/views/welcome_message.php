@@ -146,9 +146,7 @@ desired effect
           </li>
 
           <!-- Control Sidebar Toggle Button -->
-          <li>
-            <a href="#" data-toggle="control-sidebar"><i class="fa fa-gears"></i></a>
-          </li>
+          
         </ul>
       </div>
     </nav>
@@ -469,21 +467,21 @@ function data_notif_kasir()
   })
 }
 
-  function notif_member()
-  {
-    $.get("<?php echo base_url()?>index.php/barang/notif",function(e){
-      
+function notif_member()
+{
+  $.get("<?php echo base_url()?>index.php/barang/notif",function(e){
+    
 
-      $(".badge_pesanan_ku").html("");
-      if(e.jum_pesanan_ku !="0")
-      {
-        $(".badge_pesanan_ku").html(e.jum_pesanan_ku);
-      }
+    $(".badge_pesanan_ku").html("");
+    if(e.jum_pesanan_ku !=0)
+    {
+      $(".badge_pesanan_ku").html(e.jum_pesanan_ku);
+    }
 
 
-      
-    })
-  }
+    
+  })
+}
 
 
   function notif()
