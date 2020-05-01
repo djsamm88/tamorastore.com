@@ -20,8 +20,9 @@ if(isset($group_penjualan))
                 <option value='koli' $sel_koli>Koli</option>
                 ";
 
+    $class = $pend->qty_jual>$stok?"class='danger'":"";
 
-    $template = "<tr>
+    $template = "<tr $class>
                     <td>
                       <input id='jum_per_koli' type='hidden' value='$pend->jum_per_koli'>
                       <input id='jum_per_lusin' type='hidden' value='$pend->jum_per_lusin'>
@@ -29,7 +30,7 @@ if(isset($group_penjualan))
                       $pend->id
                     </td>
                     <td id='stoknya'>$stok</td>
-                    <td>$pend->nama_barang</td>
+                    <td id='nama_barang'>$pend->nama_barang</td>
                     <td>
                       <select name='satuan_jual[$z]' class='form-control' id='pilihSatuan' onchange='gantiHarga($pend->harga_retail,$pend->harga_lusin,$pend->harga_koli,$pend->jum_per_koli,$pend->jum_per_lusin,$(this))'>
                         $pilihan
@@ -388,7 +389,7 @@ $( function() {
                         "<input id='id_barang' name='id_barang["+ii+"]' type='hidden' value='"+ui.item.value+"'>";
 
         var template = "<tr>"+                
-                "<td>"+jum_batas+ui.item.value+"</td><td id='stoknya'>"+ui.item.stok+"</td><td>"+ui.item.label+"</td>"+
+                "<td>"+jum_batas+ui.item.value+"</td><td id='stoknya'>"+ui.item.stok+"</td><td id='nama_barang'>"+ui.item.label+"</td>"+
                 "<td>"+pilih_satuan+"</td>"+
                 "<td align='right'>"+
                   "<input  id='t4_harga' class='form-control' readonly name='harga_jual["+ii+"]' value='"+formatRupiah(ui.item.harga_retail)+"'>"+
@@ -457,7 +458,7 @@ function gantiHarga(a,b,c,d,e,ini)
 
 $("#tbl_datanya").on("click","tbody tr td button#remove_order",function(x){
   $(this).parent().parent().remove();
-  
+  total();
   return false;
 })
 
@@ -552,7 +553,56 @@ function total()
   total-=diskon;
   total-=saldo;
   $("#t4_total").html(formatRupiah(total));
+
+  jika_ada_stok_kurang();
 }
+
+
+function jika_ada_stok_kurang()
+{
+  var jumlah_baris=0;
+  var tidak_cukup =0;
+  var beli_minus  =0;
+  $('#tbl_datanya > tbody  > tr').each(function(index, tr) {      
+     //console.log($(tr).find("#stoknya"));
+     jumlah_baris++;
+     var stok = parseInt(buang_titik($(tr).find("#stoknya").html()));
+     var beli = parseInt(buang_titik($(tr).find("#jumlah_beli").val()));
+     
+     var nama_barang = $(tr).find("#nama_barang").html();
+     console.log(stok+"-"+beli);     
+
+     if(stok<beli)
+     {
+      alert("Stok "+nama_barang+" tidak cukup!!!");
+      tidak_cukup++;
+      
+     }
+
+     if(beli<0)
+     {
+        beli_minus++;
+     }
+  });
+
+
+  if(jumlah_baris==0 || tidak_cukup>0 || beli_minus>0)
+   {
+      $("#simpan").hide();
+   }else{
+      $("#simpan").show();
+   }
+
+
+}
+
+$('#penjualan_barang').on('keyup keypress', function(e) {
+  var keyCode = e.keyCode || e.which;
+  if (keyCode === 13) { 
+    e.preventDefault();
+    return false;
+  }
+});
 
 $("#penjualan_barang").on("submit",function(){
   if($("#t4_total").html()=="")

@@ -104,7 +104,6 @@
 
 
 
-
 </form>
 
 
@@ -153,7 +152,7 @@ $( function() {
     var semuaBarang = function(request,response){
             console.log(request.term);
             var serialize = {cari:request.term};
-            $.get("<?php echo base_url()?>index.php/barang/json_barang_toko",serialize,
+            $.get("<?php echo base_url()?>index.php/pelanggan/json_barang_member",serialize,
               function(data){
                 /*
                 response(data);

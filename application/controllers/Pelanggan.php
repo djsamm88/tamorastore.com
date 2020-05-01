@@ -41,6 +41,16 @@ class Pelanggan extends CI_Controller {
 		$this->load->view('data_barang_member',$data);
 	}
 
+	public	function json_barang_member()
+	{
+		header("Access-Control-Allow-Origin: *");
+		header("Access-Control-Allow-Headers: *");
+		header('Content-Type: application/json');	
+		$query = $this->input->get('cari'); 
+		$data['all'] = $this->m_barang->m_data_barang_member_autocomplete($query)->result();
+		echo json_encode($data['all']);
+	}
+
 	public function go_upload_bukti()
 	{
 		$bukti_transfer = upload_file('gambar');

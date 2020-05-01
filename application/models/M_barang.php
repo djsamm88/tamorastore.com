@@ -112,6 +112,34 @@ if (!defined('BASEPATH'))exit('No direct script access allowed');
 	}
 
 	
+	public function m_data_barang_member_autocomplete($cari)
+	{
+		$q = $this->db->query("SELECT a.*,IFNULL(b.qty,0) AS qty,IFNULL(c.qty,0) AS masuk  
+								FROM tbl_barang a
+								LEFT JOIN(
+										SELECT 
+											a.id_barang, 
+											IFNULL(a.qty,0)-IFNULL(b.qty,0) AS qty
+											 FROM 
+											(SELECT id_barang,SUM(jumlah) AS qty FROM `tbl_barang_transaksi` WHERE jenis='masuk' GROUP BY id_barang
+											)a 
+											LEFT JOIN 
+											(SELECT id_barang,SUM(jumlah) AS qty FROM `tbl_barang_transaksi` WHERE jenis='keluar' GROUP BY id_barang
+											)b 
+											ON a.id_barang=b.id_barang 
+								)b
+								ON a.id =b.id_barang								
+								LEFT JOIN (
+									SELECT id_barang,SUM(qty) AS qty FROM `tbl_barang_masuk_tanpa_harga` WHERE status='belum' GROUP BY id_barang
+								)c
+								ON a.id=c.id_barang
+								WHERE IFNULL(b.qty,0)>0 AND a.nama_barang LIKE '%$cari%'
+								ORDER BY b.qty DESC
+					");
+		return $q;
+	}
+
+	
 
 
 	public function m_data_gudang($id_gudang)
