@@ -361,10 +361,11 @@ $( function() {
       var stok          = parseInt(ui.item.stok);
       var jum_per_lusin = parseInt(ui.item.jum_per_lusin);
       var jum_per_koli  = parseInt(ui.item.jum_per_koli);
+      
 
       if(stok<jum_per_lusin){
         var option =   "<option value='retail'>Retail</option>"+                        
-                        "<option value='koli'>Koli</option>";
+                        "<option value='koli'>Koli</option>";        
       }
 
       if(stok<jum_per_koli){
@@ -395,7 +396,7 @@ $( function() {
                   "<input  id='t4_harga' class='form-control' readonly name='harga_jual["+ii+"]' value='"+formatRupiah(ui.item.harga_retail)+"'>"+
                 "</td>"+
                 "<td>"+
-                "<input class='form-control' type='number' id='jumlah_beli' name='jumlah["+ii+"]'  placeholder='qty' required value='1'>"+
+                "<input class='form-control' type='number' id='jumlah_beli' name='jumlah["+ii+"]'  placeholder='qty' required value='1' >"+
                 "</td>"+
                 "<td align='right' id='t4_sub_total'>"+ui.item.harga_retail+"</td>"+
                           
@@ -484,14 +485,16 @@ $("#tbl_datanya").on("keydown keyup mousedown mouseup select contextmenu drop","
 
   if(pilihSatuan=='koli' && dibeli<jum_per_koli){
     console.log("jum_per_koli"+jum_per_koli);
-    alert("Minimal beli Koli barang ini = "+jum_per_koli);
-    $(this).val(jum_per_koli);
+    //alert("Minimal beli Koli barang ini = "+jum_per_koli);
+    $(this).attr('min',jum_per_koli);
+    //$(this).val(jum_per_koli);
   }
 
   if(pilihSatuan=='lusin' && dibeli<jum_per_lusin){
     console.log("jum_per_koli"+jum_per_lusin);
-    alert("Minimal beli Lusin barang ini = "+jum_per_lusin);
-    $(this).val(jum_per_lusin);
+    //alert("Minimal beli Lusin barang ini = "+jum_per_lusin);
+    $(this).attr('min',jum_per_lusin);
+    //$(this).val(jum_per_lusin);
   }
 
   sub_total($(this));  
