@@ -577,7 +577,7 @@ function jika_ada_stok_kurang()
 
      if(stok<beli)
      {
-      alert("Stok "+nama_barang+" tidak cukup!!!");
+      //alert("Stok "+nama_barang+" tidak cukup!!!");
       tidak_cukup++;
       
      }
@@ -592,6 +592,11 @@ function jika_ada_stok_kurang()
   if(jumlah_baris==0 || tidak_cukup>0 || beli_minus>0)
    {
       $("#simpan").hide();
+      toastr["danger"]("Pesanan ini ada barang kurang stok!!!", "Kasir",{
+      onclick: function() {
+            
+        }
+      });
    }else{
       $("#simpan").show();
    }
