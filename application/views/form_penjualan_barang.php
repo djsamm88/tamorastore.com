@@ -46,12 +46,12 @@ if(isset($group_penjualan))
                     <td>
                       <button class='btn btn-danger btn-xs' id='remove_order' type='button'>Hapus</button>
                     </td>
-                  </tr>";
-
-    $all_template .=$template;
+                  </tr>";    
 
     $z++;
   }
+
+  $all_template .=$template;
 
 }else{
   $group_penjualan="";
