@@ -514,10 +514,11 @@ function notif_member()
       {
         $(".badge_gudang").html(e.semu_stok_gudang);
         //toastr.warning(e.semu_stok_gudang);
-        toastr["warning"]("Periksa stok barang di gudang!!!", "Gudang",{
+        toastr["error"]("Periksa stok barang di gudang!!!", "Gudang",{
             onclick: function() {
                   eksekusi_controller('<?php echo base_url()?>index.php/barang/stok_gudang/1','Stok Gudang');
-              }});
+              }
+            });
       }
 
 
