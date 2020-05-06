@@ -46,12 +46,12 @@ if(isset($group_penjualan))
                     <td>
                       <button class='btn btn-danger btn-xs' id='remove_order' type='button'>Hapus</button>
                     </td>
-                  </tr>";    
-      $all_template .=$template;
+                  </tr>";
+
+    $all_template .=$template;
+
     $z++;
   }
-
-
 
 }else{
   $group_penjualan="";
@@ -592,7 +592,7 @@ function jika_ada_stok_kurang()
   if(jumlah_baris==0 || tidak_cukup>0 || beli_minus>0)
    {
       $("#simpan").hide();
-      toastr["danger"]("Pesanan ini ada barang kurang stok!!!", "Kasir",{
+      toastr["error"]("Pesanan ini ada barang kurang!!!", "Kasir",{
       onclick: function() {
             
         }
