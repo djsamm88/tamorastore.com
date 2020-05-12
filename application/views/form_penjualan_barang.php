@@ -592,13 +592,18 @@ function jika_ada_stok_kurang()
   if(jumlah_baris==0 || tidak_cukup>0 || beli_minus>0)
    {
       $("#simpan").hide();
-      toastr["error"]("Pesanan ini ada barang kurang!!!", "Kasir",{
+      
+   }else{
+      $("#simpan").show();
+   }
+
+   if(tidak_cukup>0 || beli_minus>0)
+   {
+    toastr["error"]("Pesanan ini ada barang kurang!!!", "Kasir",{
       onclick: function() {
             
         }
       });
-   }else{
-      $("#simpan").show();
    }
 
 

@@ -550,7 +550,7 @@
 
         <li>
           <a href="#" onclick="eksekusi_controller('<?php echo base_url()?>index.php/pelanggan/kasir',' Kasir Belanja');return false;">
-            <i class="fa fa-link"></i> <span>Kasir</span>
+            <i class="fa fa-link"></i> <span>Belanja</span>
           </a>
         </li>
 

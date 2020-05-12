@@ -316,17 +316,19 @@ $("#tbl_datanya").on("keydown keyup mousedown mouseup select contextmenu drop","
   var pilihSatuan   = $(this).parent().parent().find("#pilihSatuan").val();
 
 
-
+  
   if(pilihSatuan=='koli' && dibeli<jum_per_koli){
     console.log("jum_per_koli"+jum_per_koli);
-    alert("Minimal beli Koli barang ini = "+jum_per_koli);
-    $(this).val(jum_per_koli);
+    //alert("Minimal beli Koli barang ini = "+jum_per_koli);
+    $(this).attr('min',jum_per_koli);
+    //$(this).val(jum_per_koli);
   }
 
   if(pilihSatuan=='lusin' && dibeli<jum_per_lusin){
     console.log("jum_per_koli"+jum_per_lusin);
-    alert("Minimal beli Lusin barang ini = "+jum_per_lusin);
-    $(this).val(jum_per_lusin);
+    //alert("Minimal beli Lusin barang ini = "+jum_per_lusin);
+    $(this).attr('min',jum_per_lusin);
+    //$(this).val(jum_per_lusin);
   }
 
   if(stok<dibeli)
@@ -334,6 +336,7 @@ $("#tbl_datanya").on("keydown keyup mousedown mouseup select contextmenu drop","
     alert("Maaf, Stok barang tinggal "+stok);
     $(this).val(stok);
   }
+  
 
 
   sub_total($(this));  
@@ -390,7 +393,12 @@ function total()
 
   total-=saldo;
   $("#t4_total").html(formatRupiah(total));
+
+
 }
+
+
+
 
 $("#penjualan_barang").on("submit",function(){
   if($("#t4_total").html()=="")
