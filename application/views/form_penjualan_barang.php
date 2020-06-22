@@ -107,7 +107,7 @@ if(isset($group_penjualan))
   <div class="col-sm-3">
     <input type="text" name="tgl_trx_manual" value="<?php echo date('Y-m-d H:i:s')?>" class="form-control datepicker">
     <small><i>Format Y-m-d H:i:s</i></small>
-    <input type="hidden" name="grup_penjualan" value="<?php echo date('ymdHis')?>" class="form-control " readonly>
+    <input type="hidden" name="grup_penjualan" value="<?php echo date('ymdHis').'_'. $this->session->userdata('id_admin');?>" class="form-control " readonly>
   </div>
 
 </div>
